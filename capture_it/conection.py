@@ -246,7 +246,6 @@ class COMMAND:
 
 	# send output to textfile
 	def send_to_file(self, output):
-		print(self.conn.hn)
 		fname = STR.get_logfile_name(self.path, hn=self.conn.hn, cmd=self.cmd, ts=self.conn.conn_time_stamp)
 		print(fname)
 		IO.to_file(filename=fname, matter=output)
