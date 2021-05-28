@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="capture_it",
-    version="0.0.2",
+    version="0.0.3",
     author="ALIASGAR - ALI",
     author_email="aholo2000@gmail.com",
     description="Excel Facts File Generate from Networking Device Output|Config",
