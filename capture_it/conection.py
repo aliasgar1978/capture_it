@@ -1,11 +1,11 @@
+
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
 from netmiko import ConnectHandler
 import paramiko, netmiko
 from time import sleep
-from os import listdir, remove
-from nettoolkit import STR, IO, IP, LOG, XL_WRITE
+from nettoolkit import STR, IO, IP, LOG
 # -----------------------------------------------------------------------------
 
 BAD_CONNECTION_MSG = ': BAD CONNECTION DETECTED, TEARED DOWN'
@@ -199,7 +199,7 @@ class conn(object):
 # Command Execution on a conn(connection) object, store to file
 # -----------------------------------------------------------------------------
 
-class COMMAND:
+class COMMAND():
 	''' CAPTURE OUTPUT FOR GIVEN COMMAND - RETURN CONTROL/OUTPUT 
 	
 	INPUT
@@ -221,7 +221,12 @@ class COMMAND:
 		self.cmd = cmd
 		self.path = path
 		self._commandOP(conn)
-		self.fname = self.send_to_file(self.commandOP)    # save to file
+
+	def op_to_file(self, cumulative=False):
+		if cumulative:
+			self.fname = self.add_to_file(self.commandOP)    # save to file
+		else:
+			self.fname = self.send_to_file(self.commandOP)    # save to file
 
 	# Representation of Command object
 	def __repr__(self):
@@ -251,6 +256,13 @@ class COMMAND:
 		IO.to_file(filename=fname, matter=output)
 		return fname
 
+	# send output to textfile
+	def add_to_file(self, output):
+		rem = "#" if self.conn.devtype == 'juniper_junos' else "!"
+		cmd_header = f"\n{rem}{'='*80}\n{rem} output for command: {self.cmd}\n{rem}{'='*80}\n\n"
+		fname = STR.get_logfile_name(self.path, hn=self.conn.hn, cmd="", ts=self.conn.conn_time_stamp)
+		IO.add_to_file(filename=fname, matter=cmd_header+output)
+		return fname
 
 # -----------------------------------------------------------------------------
 # Execution of Show Commands on a single device. 
@@ -258,10 +270,11 @@ class COMMAND:
 
 class Execute_Device():
 
-	def __init__(self, ip, auth, cmds, path):
+	def __init__(self, ip, auth, cmds, path, cumulative=False):
 		self.auth = auth
 		self.cmds = cmds
 		self.path = path
+		self.cumulative = cumulative
 		self.delay_factor, self.dev = None, None
 		pinging = self.check_ping(ip)
 		if pinging: self.get_device_type(ip)
@@ -300,12 +313,10 @@ class Execute_Device():
 					) as c:
 			if self.is_connected(c):
 				cc = self.command_capture(c)
-				# self.processed_op = Output_Process(output=cc)
-				# XL_WRITE(folder='output', **self.processed_op.dataframe_args)
-
 
 	def command_capture(self, c):
-		cc = Captures(dtype=self.dev.dtype, conn=c, cmds=self.cmds, path=self.path)
+		cc = Captures(dtype=self.dev.dtype, conn=c, 
+			cmds=self.cmds, path=self.path, cumulative=self.cumulative)
 		return cc
 
 # -----------------------------------------------------------------------------
@@ -327,10 +338,11 @@ class Common_Level_Parse():
 			return False
 		return True
 
-	def cmd_capture(self, cmd):
+	def cmd_capture(self, cmd, cumulative=False):
 		if not self.check_config_authorization(cmd): return False
 		try:
 			cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path)
+			cmdObj.op_to_file(cumulative=cumulative)
 			return cmdObj
 		except:
 			print(f"{self.hn} : Error executing command {cmd}")
@@ -341,17 +353,18 @@ class Captures(Common_Level_Parse):
 
 	# cmds = COMMANDS_LISTS
 
-	def __init__(self, dtype, conn, cmds, path):
+	def __init__(self, dtype, conn, cmds, path, cumulative=False):
 		super().__init__(dtype, conn, path)
 		self.cmds = cmds
 		self.op = ''
+		self.cumulative = cumulative
 		self.grp_cmd_capture()
 
 
 	def grp_cmd_capture(self):
 		for cmd  in self.cmds[self.dtype]:
 			try:
-				cc = self.cmd_capture(cmd)
+				cc = self.cmd_capture(cmd, self.cumulative)
 				if not cc: return None
 				cmd_line = self.hn + ">" + cmd + "\n"
 				self.op += cmd_line + "\n" + cc.commandOP + "\n\n"
