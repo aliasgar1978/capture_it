@@ -1,7 +1,7 @@
 
 # -----------------------------------------------------------------------------
 import os
-from nettoolkit import Validation, LST, Multi_Execution
+from nettoolkit import Validation, STR, Multi_Execution
 
 from .conection import Execute_Device
 

@@ -3,7 +3,7 @@
 # Imports
 # -----------------------------------------------------------------------------
 from netmiko import ConnectHandler
-import paramiko, netmiko
+import paramiko, traceback
 from time import sleep
 from nettoolkit import STR, IO, IP, LOG
 # -----------------------------------------------------------------------------
