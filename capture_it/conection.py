@@ -224,9 +224,12 @@ class COMMAND():
 
 	def op_to_file(self, cumulative=False):
 		if cumulative:
-			self.fname = self.add_to_file(self.commandOP)    # save to file
+			self.fname = self.add_to_file(self.commandOP)    # add to file		
 		else:
 			self.fname = self.send_to_file(self.commandOP)    # save to file
+		if isinstance(cumulative, str) and cumulative=='both':
+			self.fname = self.send_to_file(self.commandOP)    # save to file
+		return self.fname
 
 	# Representation of Command object
 	def __repr__(self):
@@ -252,7 +255,7 @@ class COMMAND():
 	# send output to textfile
 	def send_to_file(self, output):
 		fname = STR.get_logfile_name(self.path, hn=self.conn.hn, cmd=self.cmd, ts=self.conn.conn_time_stamp)
-		print(fname)
+		print('> '+fname)
 		IO.to_file(filename=fname, matter=output)
 		return fname
 
@@ -340,9 +343,9 @@ class Common_Level_Parse():
 
 	def cmd_capture(self, cmd, cumulative=False):
 		if not self.check_config_authorization(cmd): return False
-		try:
+		try:			
 			cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path)
-			cmdObj.op_to_file(cumulative=cumulative)
+			file = cmdObj.op_to_file(cumulative=cumulative)
 			return cmdObj
 		except:
 			print(f"{self.hn} : Error executing command {cmd}")
