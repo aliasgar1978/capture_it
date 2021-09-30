@@ -224,9 +224,11 @@ class COMMAND():
 
 	def op_to_file(self, cumulative=False):
 		if cumulative:
-			self.fname = self.add_to_file(self.commandOP)    # add to file		
+			self.fname = self.add_to_file(self.commandOP)    # add to file
+			print(self.cmd, ">> ", self.fname)		
 		else:
 			self.fname = self.send_to_file(self.commandOP)    # save to file
+			print(self.cmd, ">> ", self.fname)
 		if isinstance(cumulative, str) and cumulative=='both':
 			self.fname = self.send_to_file(self.commandOP)    # save to file
 		return self.fname
