@@ -1,4 +1,3 @@
-
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
@@ -9,6 +8,20 @@ from nettoolkit import STR, IO, IP, LOG
 # -----------------------------------------------------------------------------
 
 BAD_CONNECTION_MSG = ': BAD CONNECTION DETECTED, TEARED DOWN'
+cisco_banner ="""
+! ---------------------------------------------------------------------------- !
+! This output is generated using capture_it utility.
+! Script written by : Aliasgar Hozaifa Lokhandwala (aholo2000@gmail.com)
+! Write an email if any errors found.
+! ---------------------------------------------------------------------------- !
+"""
+juniper_banner = """
+# ---------------------------------------------------------------------------- #
+# This output is generated using capture_it utility.
+# Script written by : Aliasgar Hozaifa Lokhandwala (aholo2000@gmail.com)
+# Write an email if any errors found.
+# ---------------------------------------------------------------------------- #
+"""
 # -----------------------------------------------------------------------------
 # Device Type Detection (1st Connection)
 # -----------------------------------------------------------------------------
@@ -104,6 +117,7 @@ class conn(object):
 		self._devtype = devtype 						# eg. cisco_ios
 		self._devvar = {'ip': ip, 'host': hostname }	# device variables
 		self.__set_local_var(un, pw, en)				# setting 
+		self.banner = juniper_banner if self.devtype == 'juniper_junos' else cisco_banner
 		self.delay_factor = delay_factor
 		self.clsString = f'Device Connection: \
 {self.devtype}/{self._devvar["ip"]}/{self._devvar["host"]}'
@@ -222,10 +236,11 @@ class COMMAND():
 		self.path = path
 		self._commandOP(conn)
 
+
 	def op_to_file(self, cumulative=False):
-		if cumulative:
-			self.fname = self.add_to_file(self.commandOP)    # add to file
-			print(self.cmd, ">> ", self.fname)		
+		if cumulative:			
+			self.fname = self.add_to_file(self.commandOP)    # add to file		
+			print(self.cmd, ">> ", self.fname)
 		else:
 			self.fname = self.send_to_file(self.commandOP)    # save to file
 			print(self.cmd, ">> ", self.fname)
@@ -263,10 +278,11 @@ class COMMAND():
 
 	# send output to textfile
 	def add_to_file(self, output):
+		banner = self.banner if self.banner else ""
 		rem = "#" if self.conn.devtype == 'juniper_junos' else "!"
 		cmd_header = f"\n{rem}{'='*80}\n{rem} output for command: {self.cmd}\n{rem}{'='*80}\n\n"
 		fname = STR.get_logfile_name(self.path, hn=self.conn.hn, cmd="", ts=self.conn.conn_time_stamp)
-		IO.add_to_file(filename=fname, matter=cmd_header+output)
+		IO.add_to_file(filename=fname, matter=banner+cmd_header+output)
 		return fname
 
 # -----------------------------------------------------------------------------
@@ -343,10 +359,11 @@ class Common_Level_Parse():
 			return False
 		return True
 
-	def cmd_capture(self, cmd, cumulative=False):
+	def cmd_capture(self, cmd, cumulative=False, banner=False):
 		if not self.check_config_authorization(cmd): return False
 		try:			
 			cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path)
+			cmdObj.banner = banner
 			file = cmdObj.op_to_file(cumulative=cumulative)
 			return cmdObj
 		except:
@@ -367,10 +384,12 @@ class Captures(Common_Level_Parse):
 
 
 	def grp_cmd_capture(self):
+		banner = self.conn.banner
 		for cmd  in self.cmds[self.dtype]:
 			try:
-				cc = self.cmd_capture(cmd, self.cumulative)
+				cc = self.cmd_capture(cmd, self.cumulative, banner)
 				if not cc: return None
 				cmd_line = self.hn + ">" + cmd + "\n"
 				self.op += cmd_line + "\n" + cc.commandOP + "\n\n"
+				banner = ""
 			except: pass
