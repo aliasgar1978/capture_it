@@ -8,8 +8,25 @@ from .conection import Execute_Device
 # -----------------------------------------------------------------------------
 
 class Execute_By_Login(Multi_Execution):
+	"""Execute the device capture by logging in to device.
+
+	"""    	
 
 	def __init__(self, ip_list, auth, cmds, path, cumulative=False):
+		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
+
+		Args:
+			ip_list (set, list, tuple): set of ip addresses to be logging for capture
+			auth (dict): authentication parameters ( un, pw, en)
+			cmds (set, list, tuple): set of commands to be captured
+			path (str): path where output should be stored.
+			cumulative (bool, optional): True: will store all commands output in a single file, 
+				False will store each command output in differet file. Defaults to False.
+				and 'both' will do both.
+
+		Raises:
+			Exception: raise exception if any issue with authentication or connections.
+		"""    		
 		self.devices = STR.to_set(ip_list) if isinstance(ip_list, str) else set(ip_list)
 		self.auth = auth
 		if not isinstance(cmds, dict):
@@ -22,6 +39,14 @@ class Execute_By_Login(Multi_Execution):
 		# self.end()
 
 	def is_valid(self, ip):
+		"""Validation function to check if provided ip is valid IPv4 or IPv6 address
+
+		Args:
+			ip (str): ipv4 or ipv6 address
+
+		Returns:
+			bool: True/False based on validation success/fail
+		"""    		
 		try:
 			return ip and Validation(ip).version in (4, 6)
 		except:
@@ -30,5 +55,10 @@ class Execute_By_Login(Multi_Execution):
 		return True
 
 	def execute(self, hn):
+		"""execution function for a single device. hn == ip address in this case.
+
+		Args:
+			hn (str): ip address of a reachable device
+		"""    		
 		Execute_Device(hn, auth=self.auth, 
 			cmds=self.cmds, path=self.path, cumulative=self.cumulative)

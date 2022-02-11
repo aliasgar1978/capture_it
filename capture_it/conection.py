@@ -9,25 +9,44 @@ from nettoolkit import STR, IO, IP, LOG
 # -----------------------------------------------------------------------------
 
 BAD_CONNECTION_MSG = ': BAD CONNECTION DETECTED, TEARED DOWN'
+cisco_banner ="""
+! ---------------------------------------------------------------------------- !
+! This output is generated using capture_it utility.
+! Script written by : Aliasgar Hozaifa Lokhandwala (aholo2000@gmail.com)
+! Write an email if any errors found.
+! ---------------------------------------------------------------------------- !
+"""
+juniper_banner = """
+# ---------------------------------------------------------------------------- #
+# This output is generated using capture_it utility.
+# Script written by : Aliasgar Hozaifa Lokhandwala (aholo2000@gmail.com)
+# Write an email if any errors found.
+# ---------------------------------------------------------------------------- #
+"""
 # -----------------------------------------------------------------------------
 # Device Type Detection (1st Connection)
 # -----------------------------------------------------------------------------
 class DeviceType:
-	'''Defines Device type ( 'cisco_ios', 'arista_eos', 'juniper_junos')
+	"""'Defines Device type ( 'cisco_ios', 'arista_eos', 'juniper_junos')
 
-	INPUT
-	-----
-	dev_ip - ip address of device
-	un     - username to login to device
-	pw     - password to login to device
+	Args:
+		dev_ip (str): ip address of device
+		un (str): username to login to device
+		pw (str): password to login to device
 	
-	RETURNS
-	-------
-	dtype - device type (default/or exception will return 'cisco_ios')
-	'''
+	Properties:
+		dtype (str): device type (default/or exception will return 'cisco_ios')
+	"""    	
 
 	# INITIALIZER - DEVICE TYPE
 	def __init__(self, dev_ip, un, pw):
+		"""initialize object with given ip and credentials
+
+		Args:
+			dev_ip (str): ip address of device
+			un (str): username to login to device
+			pw (str): password to login to device
+		"""    		
 		'''class initializer'''
 		self.device_types = {'cisco': 'cisco_ios',
 						'arista': 'arista_eos',
@@ -37,6 +56,14 @@ class DeviceType:
 	# device type
 	@property
 	def dtype(self):
+		"""device type
+		* 'cisco': 'cisco_ios',
+		* 'arista': 'arista_eos',
+		* 'juniper': 'juniper_junos'
+
+		Returns:
+			str: device type
+		"""    		
 		return self.device_type
 
 	# set device type
@@ -71,25 +98,23 @@ class DeviceType:
 # -----------------------------------------------------------------------------
 
 class conn(object):
-	'''Initiate an active connection
+	"""Initiate an active connection.  
 	use it with context manager to execute necessary commands on to it.
-	
-	INPUT
-	-----
-	ip - ip address of device to establish ssh connection with
-	un - username to login to device
-	pw - user password to login to device
-	en - enable password (For cisco)
-	devtype - device type from DeviceType class
-	hostname -  hostname of device ( if known )
 
-	Connection Properties
-	---------------------
-	hn = hostname
-	devvar = {'ip':ip, 'host':hostname}
-	devtype = device type ('cisco_ios', 'arista_eos', 'juniper_junos')
-	'''
+	Args:
+		ip (str): ip address of device to establish ssh connection with
+		un (str): username to login to device
+		pw (str): user password to login to device
+		en (str): enable password (For cisco)
+		delay_factor (int): connection stability factor
+		devtype (str, optional): device type from DeviceType class. Defaults to ''.
+		hostname (str, optional): hostname of device ( if known ). Defaults to ''.
 
+	Properties:
+		hn (str): hostname
+		devvar (dict) : {'ip':ip, 'host':hostname}
+		devtype (str) : device type ('cisco_ios', 'arista_eos', 'juniper_junos')
+	"""    	
 	# Connection Initializer
 	def __init__(self, 
 		ip, 
@@ -100,10 +125,22 @@ class conn(object):
 		devtype='', 
 		hostname='', 
 		):
+		"""initiate a connection object
+
+			Args:
+			ip (str): ip address of device to establish ssh connection with
+			un (str): username to login to device
+			pw (str): user password to login to device
+			en (str): enable password (For cisco)
+			delay_factor (int): connection stability factor
+			devtype (str, optional): device type from DeviceType class. Defaults to ''.
+			hostname (str, optional): hostname of device ( if known ). Defaults to ''.
+		"""		
 		self.conn_time_stamp = LOG.time_stamp()
 		self._devtype = devtype 						# eg. cisco_ios
 		self._devvar = {'ip': ip, 'host': hostname }	# device variables
 		self.__set_local_var(un, pw, en)				# setting 
+		self.banner = juniper_banner if self.devtype == 'juniper_junos' else cisco_banner
 		self.delay_factor = delay_factor
 		self.clsString = f'Device Connection: \
 {self.devtype}/{self._devvar["ip"]}/{self._devvar["host"]}'
@@ -138,11 +175,24 @@ class conn(object):
 	# RETURN --- > DEVICETYPE
 	@property
 	def devtype(self):
+		"""device type
+		* 'cisco': 'cisco_ios',
+		* 'arista': 'arista_eos',
+		* 'juniper': 'juniper_junos'
+
+		Returns:
+			str: device type
+		"""    
 		return self._devtype
 
 	# RETURN --- > DEVICE HOSTNAME
 	@property
 	def hn(self):
+		"""device hostname
+
+		Returns:
+			str: device hostname
+		"""    
 		# return self._hn
 		return self._devvar['host']
 
@@ -200,32 +250,47 @@ class conn(object):
 # -----------------------------------------------------------------------------
 
 class COMMAND():
-	''' CAPTURE OUTPUT FOR GIVEN COMMAND - RETURN CONTROL/OUTPUT 
-	
-	INPUT
-	-----
-	conn - connection object
-	cmd  - command to be executed on conn
+	"""CAPTURE OUTPUT FOR GIVEN COMMAND - RETURN CONTROL/OUTPUT 
 
-	class properties
-	----------------
-	cmd               - command executed
-	commandOP, output - command output
-	fname             - full filename with path where output stored
-	'''
+	Args:
+		conn (conn): connection object
+		cmd (str): a command to be executed
+		path (str): path where output to be stored
+
+
+	Properties:
+		cmd (str): command executed
+		commandOP, output (str) - command output
+		fname (filename): full filename with path where output stored
+	"""    	
 
 	# INITIALIZE class vars
 	def __init__(self, conn, cmd, path):
-		'''initializer'''
+		"""[summary]
+
+		Args:
+			conn (conn): connection object
+			cmd (str): a command to be executed
+			path (str): path where output to be stored
+		"""    		
 		self.conn = conn
 		self.cmd = cmd
 		self.path = path
 		self._commandOP(conn)
 
+
 	def op_to_file(self, cumulative=False):
-		if cumulative:
-			self.fname = self.add_to_file(self.commandOP)    # add to file
-			print(self.cmd, ">> ", self.fname)		
+		"""store output of command to file, cumulative (True,False,both) to store output in a single file, individual files, both
+
+		Args:
+			cumulative (bool, optional): True,False,both. Defaults to False.
+
+		Returns:
+			str: file name where output get stored
+		"""    		
+		if cumulative:			
+			self.fname = self.add_to_file(self.commandOP)    # add to file		
+			print(self.cmd, ">> ", self.fname)
 		else:
 			self.fname = self.send_to_file(self.commandOP)    # save to file
 			print(self.cmd, ">> ", self.fname)
@@ -240,7 +305,7 @@ class COMMAND():
 	# RETURNS ---> Command output
 	@property
 	def commandOP(self):
-		'''get command output'''
+		'''command output'''
 		return self.output
 
 	# capture output from connection
@@ -256,6 +321,14 @@ class COMMAND():
 
 	# send output to textfile
 	def send_to_file(self, output):
+		"""send output to a text file
+
+		Args:
+			output (str): captured output
+
+		Returns:
+			str: filename where output got stored
+		"""    		
 		fname = STR.get_logfile_name(self.path, hn=self.conn.hn, cmd=self.cmd, ts=self.conn.conn_time_stamp)
 		print('> '+fname)
 		IO.to_file(filename=fname, matter=output)
@@ -263,10 +336,19 @@ class COMMAND():
 
 	# send output to textfile
 	def add_to_file(self, output):
+		"""add output to a text file
+
+		Args:
+			output (str): captured output
+
+		Returns:
+			str: filename where output got appended
+		"""    		
+		banner = self.banner if self.banner else ""
 		rem = "#" if self.conn.devtype == 'juniper_junos' else "!"
 		cmd_header = f"\n{rem}{'='*80}\n{rem} output for command: {self.cmd}\n{rem}{'='*80}\n\n"
 		fname = STR.get_logfile_name(self.path, hn=self.conn.hn, cmd="", ts=self.conn.conn_time_stamp)
-		IO.add_to_file(filename=fname, matter=cmd_header+output)
+		IO.add_to_file(filename=fname, matter=banner+cmd_header+output)
 		return fname
 
 # -----------------------------------------------------------------------------
@@ -274,8 +356,26 @@ class COMMAND():
 # -----------------------------------------------------------------------------
 
 class Execute_Device():
+	"""Execute a device capture
+
+	Args:
+		ip (str): device ip
+		auth (dict): authentication parameters
+		cmds (list, set, tuple): set of commands to be executed.
+		path (str): path where output to be stored
+		cumulative (bool, optional): True,False,both. Defaults to False.
+	"""    	
 
 	def __init__(self, ip, auth, cmds, path, cumulative=False):
+		"""initialize execution
+
+		Args:
+			ip (str): device ip
+			auth (dict): authentication parameters
+			cmds (list, set, tuple): set of commands to be executed.
+			path (str): path where output to be stored
+			cumulative (bool, optional): True,False,both. Defaults to False.
+		"""    		
 		self.auth = auth
 		self.cmds = cmds
 		self.path = path
@@ -288,6 +388,14 @@ class Execute_Device():
 			self.execute(ip)
 
 	def check_ping(self, ip):
+		"""check device reachability
+
+		Args:
+			ip (str): device ip
+
+		Returns:
+			int: delay factor if device reachable,  else False
+		"""    		
 		try:
 			self.delay_factor = IP.ping_average (ip)/100+3
 			return self.delay_factor
@@ -295,20 +403,43 @@ class Execute_Device():
 			return False
 
 	def get_device_type(self, ip):
+		"""detect device type (cisco, juniper)
+
+		Args:
+			ip (str): device ip
+
+		Returns:
+			str: device type if detected, else None
+		"""    		
 		try:
-			self.dev = DeviceType(dev_ip=ip, un=self.auth['un'], pw=self.auth['pw'])
+			self.dev = DeviceType(dev_ip=ip, 
+				un=self.auth['un'], 
+				pw=self.auth['pw'])
 			return self.dev
 		except:
 			return None
 
 	def is_connected(self, c):
-		if STR.found(str(c), "FAILURE"): return None
-		if c.hn == None or c.hn == 'dummy':
-			return None
-		return True
+		"""check if connection is successful
+
+		Args:
+			c (conn): connection object
+
+		Returns:
+			conn: connection object if successful, otherwise None
+		"""    		
+		connection = True
+		if STR.found(str(c), "FAILURE"): connection = None
+		if c.hn == None or c.hn == 'dummy': connection = None
+		return connection
 
 	def execute(self, ip):
-		'''login to given device(ip) using uservars (u), commands list '''	
+		"""login to given device(ip) using authentication parameters from uservar (u).
+		if success start command captuers
+
+		Args:
+			ip (str): device ip
+		"""    		
 		with conn(	ip=ip, 
 					un=self.auth['un'], 
 					pw=self.auth['pw'], 
@@ -317,48 +448,113 @@ class Execute_Device():
 					devtype=self.dev.dtype,
 					) as c:
 			if self.is_connected(c):
-				cc = self.command_capture(c)
+				self.command_capture(c)
 
 	def command_capture(self, c):
-		cc = Captures(dtype=self.dev.dtype, conn=c, 
-			cmds=self.cmds, path=self.path, cumulative=self.cumulative)
-		return cc
+		"""start command captures on connection object
+
+		Args:
+			c (conn): connection object
+		"""    		
+		Captures(dtype=self.dev.dtype, 
+			conn=c, 
+			cmds=self.cmds, 
+			path=self.path, 
+			cumulative=self.cumulative)
 
 # -----------------------------------------------------------------------------
 # Execution of Show Commands on a single device. 
 # -----------------------------------------------------------------------------
 
-class Common_Level_Parse():
+class CLP():
+	"""parent for Command processing
+
+	Args:
+		dtype (str): device type
+		conn (conn): connection object
+		path (str): path to store the captured output	
+	"""    	
 	def __init__(self, dtype, conn, path):
+		"""Initialize object
+
+		Args:
+			dtype (str): device type
+			conn (conn): connection object
+			path (str): path to store the captured output	
+		"""    		
 		self.dtype = dtype
 		self.conn = conn
 		self.path = path
 		self.hn = self.conn.hn
 		self.ip = self.conn.devvar['ip']
+		self.configure(False)						# fixed disable as now
+
+	def configure(self, config_mode=False):
+		"""set configuration mode
+
+		Args:
+			config_mode (bool, optional): enable/disable config commands. Defaults to False.
+		"""    		
+		self._configure = config_mode
 
 	def check_config_authorization(self, cmd):
-		config_mode_disable = True						# fixed disabled as now
-		if config_mode_disable and 'config' == cmd.lstrip()[:6].lower():
+		"""check if given command is allowed or not on this device.
+
+		Args:
+			cmd (str): command to be executed
+
+		Returns:
+			bool: True/False
+		"""    		
+		if not self._configure and 'config' == cmd.lstrip()[:6].lower():
 			print(f"{self.hn} : Config Mode disabled, Exiting")
 			return False
 		return True
 
-	def cmd_capture(self, cmd, cumulative=False):
-		if not self.check_config_authorization(cmd): return False
+	def cmd_capture(self, cmd, cumulative=False, banner=False):
+		"""start command capture for given command
+
+		Args:
+			cmd (str): command to be executed
+			cumulative (bool, optional): True/False/both. Defaults to False.
+			banner (bool, optional): set a banner property to object if given. Defaults to False.
+
+		Returns:
+			[type]: [description]
+		"""    		
 		try:			
 			cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path)
+			cmdObj.banner = banner
 			file = cmdObj.op_to_file(cumulative=cumulative)
 			return cmdObj
 		except:
 			print(f"{self.hn} : Error executing command {cmd}")
+			return None
 
 
 
-class Captures(Common_Level_Parse):
+class Captures(CLP):
+	"""Capture output
 
-	# cmds = COMMANDS_LISTS
+	Args:
+		dtype (str): device type
+		conn (conn): connection object
+		cmds (set, list, tuple): set of commands 
+		path (str): path to store the captured output
+		cumulative (bool, optional): True/False/both. Defaults to False.
+
+	"""    	
 
 	def __init__(self, dtype, conn, cmds, path, cumulative=False):
+		"""Initiate captures
+
+		Args:
+			dtype (str): device type
+			conn (conn): connection object
+			cmds (set, list, tuple): set of commands 
+			path (str): path to store the captured output
+			cumulative (bool, optional): True/False/both. Defaults to False.
+		"""    		
 		super().__init__(dtype, conn, path)
 		self.cmds = cmds
 		self.op = ''
@@ -367,10 +563,21 @@ class Captures(Common_Level_Parse):
 
 
 	def grp_cmd_capture(self):
+		"""grep the command captures for each commands	
+		Unauthorized command will halt execution.
+
+		Returns:
+			None: None
+		"""    		
+		banner = self.conn.banner
 		for cmd  in self.cmds[self.dtype]:
 			try:
-				cc = self.cmd_capture(cmd, self.cumulative)
-				if not cc: return None
+				if not self.check_config_authorization(cmd): 
+					print(f"UnAuthorizedCommandDetected-{cmd}-EXECUTIONHALTED")
+					return None
+				cc = self.cmd_capture(cmd, self.cumulative, banner)
+				output = cc.commandOP if cc else f": Error executing command {cmd}"
 				cmd_line = self.hn + ">" + cmd + "\n"
-				self.op += cmd_line + "\n" + cc.commandOP + "\n\n"
+				self.op += cmd_line + "\n" + output + "\n\n"
 			except: pass
+			banner = ""
