@@ -8,10 +8,10 @@ Welcome to capture_it's documentation!
    :caption: Contents:
    :numbered:
 
-   _preface
-   _install
-   execution
-   tech_doc
+   Preface <_preface>
+   Install <_install>
+   Executions <execution>
+   API Documentations <tech_doc>
 
 
 
