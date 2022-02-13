@@ -7,6 +7,8 @@ Welcome to capture_it's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   _preface
+   _install
    execution
    tech_doc
 
