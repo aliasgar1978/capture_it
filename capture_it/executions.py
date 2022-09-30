@@ -1,4 +1,3 @@
-
 # -----------------------------------------------------------------------------
 import os
 from nettoolkit import Validation, STR, Multi_Execution
@@ -12,7 +11,7 @@ class Execute_By_Login(Multi_Execution):
 
 	"""    	
 
-	def __init__(self, ip_list, auth, cmds, path, cumulative=False):
+	def __init__(self, ip_list, auth, cmds, path, cumulative=False, forced_login=False):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
 		Args:
@@ -34,6 +33,7 @@ class Execute_By_Login(Multi_Execution):
 		self.cmds = cmds
 		self.path = path
 		self.cumulative = cumulative
+		self.forced_login = forced_login
 		super().__init__(self.devices)
 		self.start()
 		# self.end()
@@ -61,4 +61,5 @@ class Execute_By_Login(Multi_Execution):
 			hn (str): ip address of a reachable device
 		"""    		
 		Execute_Device(hn, auth=self.auth, 
-			cmds=self.cmds, path=self.path, cumulative=self.cumulative)
+			cmds=self.cmds, path=self.path, cumulative=self.cumulative,
+			forced_login=self.forced_login)

@@ -1,4 +1,3 @@
-
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
@@ -311,11 +310,16 @@ class COMMAND():
 	# capture output from connection
 	def _commandOP(self, conn):
 		self.output = ''
-		op = conn.net_connect.send_command(self.cmd, delay_factor=self.conn.delay_factor)
+
+		op = self.conn.net_connect.send_command(self.cmd, 
+				read_timeout=20, 
+				delay_factor=self.conn.delay_factor)
+
 		# exclude missed ones
 		if any([								
 			STR.found(op,'Connection refused')
 			]):                                 ### ADD More as needed ###
+			print(" CONNECTION WAS REFUSED ")
 			return None
 		self.output = op
 
@@ -366,7 +370,7 @@ class Execute_Device():
 		cumulative (bool, optional): True,False,both. Defaults to False.
 	"""    	
 
-	def __init__(self, ip, auth, cmds, path, cumulative=False):
+	def __init__(self, ip, auth, cmds, path, cumulative=False, forced_login=False):
 		"""initialize execution
 
 		Args:
@@ -380,12 +384,18 @@ class Execute_Device():
 		self.cmds = cmds
 		self.path = path
 		self.cumulative = cumulative
+		self.forced_login = forced_login
 		self.delay_factor, self.dev = None, None
 		pinging = self.check_ping(ip)
-		if pinging: self.get_device_type(ip)
-		if pinging and self.dev is not None:
-			if self.dev.dtype == 'cisco_ios': sleep(65)
+		if forced_login or pinging:
+			self.get_device_type(ip)
+			try:
+				self.dev.dtype
+			except:
+				print(f"DeviceType not detected for {ip}")
+			if self.dev is not None and self.dev.dtype == 'cisco_ios': sleep(65)
 			self.execute(ip)
+
 
 	def check_ping(self, ip):
 		"""check device reachability
@@ -397,7 +407,8 @@ class Execute_Device():
 			int: delay factor if device reachable,  else False
 		"""    		
 		try:
-			self.delay_factor = IP.ping_average (ip)/100+3
+			self.delay_factor = IP.ping_average (ip)/100 + 3
+			# print(self.delay_factor)
 			return self.delay_factor
 		except:
 			return False
@@ -522,7 +533,9 @@ class CLP():
 		Returns:
 			[type]: [description]
 		"""    		
-		try:			
+		# cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path)
+		try:
+
 			cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path)
 			cmdObj.banner = banner
 			file = cmdObj.op_to_file(cumulative=cumulative)
@@ -571,13 +584,14 @@ class Captures(CLP):
 		"""    		
 		banner = self.conn.banner
 		for cmd  in self.cmds[self.dtype]:
-			try:
-				if not self.check_config_authorization(cmd): 
-					print(f"UnAuthorizedCommandDetected-{cmd}-EXECUTIONHALTED")
-					return None
-				cc = self.cmd_capture(cmd, self.cumulative, banner)
-				output = cc.commandOP if cc else f": Error executing command {cmd}"
-				cmd_line = self.hn + ">" + cmd + "\n"
-				self.op += cmd_line + "\n" + output + "\n\n"
-			except: pass
+			# try:
+			if not self.check_config_authorization(cmd): 
+				print(f"UnAuthorizedCommandDetected-{cmd}-EXECUTIONHALTED")
+				return None
+			cc = self.cmd_capture(cmd, self.cumulative, banner)
+			# output = cc.commandOP #if cc else f": Error executing command {cmd}"
+			output = cc.output
+			cmd_line = self.hn + ">" + cmd + "\n"
+			self.op += cmd_line + "\n" + output + "\n\n"
+			# except: pass
 			banner = ""
