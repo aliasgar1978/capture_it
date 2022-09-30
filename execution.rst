@@ -60,14 +60,16 @@ Execution Steps - Detailed
 
 		capture(devices, auth, cmds, op_path, cumulative='Both', forced_login=True)
 
-	Parameters:
+.. important::
+	
+	Parameters
 
-		devices = list of ip addresses
-		auth = authentication Parameters
-		cmds = dictionary of list of commands to be captred (cisco, juniper, arista).
-		op_path = output path ( use "." for storing in same relative folder )
-		cumulative = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
-		forced_login=(Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
+	* devices = list of ip addresses
+	* auth = authentication Parameters
+	* cmds = dictionary of list of commands to be captred (cisco, juniper, arista).
+	* op_path = output path ( use "." for storing in same relative folder )
+	* cumulative = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
+	* forced_login=(Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
 
 -----------------------
 
