@@ -590,8 +590,10 @@ class Captures(CLP):
 				return None
 			cc = self.cmd_capture(cmd, self.cumulative, banner)
 			# output = cc.commandOP #if cc else f": Error executing command {cmd}"
-			output = cc.output
+			try:
+				output = cc.output
+			except:
+				output = f": Error executing command {cmd}"
 			cmd_line = self.hn + ">" + cmd + "\n"
 			self.op += cmd_line + "\n" + output + "\n\n"
-			# except: pass
 			banner = ""
