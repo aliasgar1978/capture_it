@@ -58,7 +58,7 @@ Execution Steps - Detailed
 
 	#. Start Capturing::
 
-		capture(devices, auth, cmds, op_path, cumulative='Both', forced_login=True)
+		capture(devices, auth, cmds, op_path, cumulative='Both', forced_login=True, parsed_output=True)
 
 .. important::
 	
@@ -70,6 +70,7 @@ Execution Steps - Detailed
 	* op_path = output path ( use "." for storing in same relative folder )
 	* cumulative = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
 	* forced_login=(Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
+	* parsed_output=(Options: True, False) (Default: False) Parse the command output and generates device database in excel file.
 
 -----------------------
 

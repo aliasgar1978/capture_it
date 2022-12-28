@@ -1,3 +1,5 @@
-nettoolkit>=0.0.8
+nettoolkit>=0.0.15
 paramiko>=2.7.0
 netmiko>=3.1.0
+pandas>=1.4.3
+ntc-templates>=3.0.0
