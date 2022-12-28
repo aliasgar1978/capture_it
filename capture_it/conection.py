@@ -3,8 +3,10 @@
 # -----------------------------------------------------------------------------
 from netmiko import ConnectHandler
 import paramiko, traceback
+import pandas as pd
 from time import sleep
 from nettoolkit import STR, IO, IP, LOG
+from .database import append_to_xl
 # -----------------------------------------------------------------------------
 
 BAD_CONNECTION_MSG = ': BAD CONNECTION DETECTED, TEARED DOWN'
@@ -264,17 +266,19 @@ class COMMAND():
 	"""    	
 
 	# INITIALIZE class vars
-	def __init__(self, conn, cmd, path):
+	def __init__(self, conn, cmd, path, parsed_output):
 		"""[summary]
 
 		Args:
 			conn (conn): connection object
 			cmd (str): a command to be executed
 			path (str): path where output to be stored
+			parsed_output(bool): generate parsed excel database for the command
 		"""    		
 		self.conn = conn
 		self.cmd = cmd
 		self.path = path
+		self.parsed_output = parsed_output
 		self._commandOP(conn)
 
 
@@ -313,7 +317,9 @@ class COMMAND():
 
 		op = self.conn.net_connect.send_command(self.cmd, 
 				read_timeout=20, 
-				delay_factor=self.conn.delay_factor)
+				delay_factor=self.conn.delay_factor,
+				use_textfsm=self.parsed_output,
+				)
 
 		# exclude missed ones
 		if any([								
@@ -370,7 +376,7 @@ class Execute_Device():
 		cumulative (bool, optional): True,False,both. Defaults to False.
 	"""    	
 
-	def __init__(self, ip, auth, cmds, path, cumulative=False, forced_login=False):
+	def __init__(self, ip, auth, cmds, path, cumulative=False, forced_login=False, parsed_output=False):
 		"""initialize execution
 
 		Args:
@@ -379,12 +385,16 @@ class Execute_Device():
 			cmds (list, set, tuple): set of commands to be executed.
 			path (str): path where output to be stored
 			cumulative (bool, optional): True,False,both. Defaults to False.
+			forced_login(bool): try to login/ssh device even if ping responce fails.
+			parsed_output(bool): generate parsed excel database for the device for show commands.
+		
 		"""    		
 		self.auth = auth
 		self.cmds = cmds
 		self.path = path
 		self.cumulative = cumulative
 		self.forced_login = forced_login
+		self.parsed_output = parsed_output
 		self.delay_factor, self.dev = None, None
 		pinging = self.check_ping(ip)
 		if forced_login or pinging:
@@ -459,7 +469,8 @@ class Execute_Device():
 					devtype=self.dev.dtype,
 					) as c:
 			if self.is_connected(c):
-				self.command_capture(c)
+				cc = self.command_capture(c)
+				if self.parsed_output: cc.write_facts()
 
 	def command_capture(self, c):
 		"""start command captures on connection object
@@ -467,11 +478,14 @@ class Execute_Device():
 		Args:
 			c (conn): connection object
 		"""    		
-		Captures(dtype=self.dev.dtype, 
+		cc = Captures(dtype=self.dev.dtype, 
 			conn=c, 
 			cmds=self.cmds, 
 			path=self.path, 
-			cumulative=self.cumulative)
+			cumulative=self.cumulative,
+			parsed_output=self.parsed_output
+			)
+		return cc
 
 # -----------------------------------------------------------------------------
 # Execution of Show Commands on a single device. 
@@ -485,17 +499,21 @@ class CLP():
 		conn (conn): connection object
 		path (str): path to store the captured output	
 	"""    	
-	def __init__(self, dtype, conn, path):
+	def __init__(self, dtype, conn, path, parsed_output):
 		"""Initialize object
 
 		Args:
 			dtype (str): device type
 			conn (conn): connection object
-			path (str): path to store the captured output	
+			path (str): path to store the captured output
+			parsed_output(bool): generate parsed excel database for the device for all commands.				
 		"""    		
 		self.dtype = dtype
 		self.conn = conn
 		self.path = path
+		self.parsed_output = parsed_output
+		self.parsed_cmd_df = {}
+		self.cmd_exec_logs = []
 		self.hn = self.conn.hn
 		self.ip = self.conn.devvar['ip']
 		self.configure(False)						# fixed disable as now
@@ -533,16 +551,45 @@ class CLP():
 		Returns:
 			[type]: [description]
 		"""    		
-		# cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path)
-		try:
+		self.cmd_exec_logs.append({'command':cmd})
+		cmdObj = self._cmd_capture_raw(cmd, cumulative, banner)
+		if cmdObj is not None:
+			self._cmd_capture_parsed(cmd, cumulative, banner)
+		return cmdObj
 
-			cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path)
-			cmdObj.banner = banner
-			file = cmdObj.op_to_file(cumulative=cumulative)
-			return cmdObj
+	def _cmd_capture_raw(self, cmd, cumulative=False, banner=False):
+		try:
+			cmdObj = COMMAND(conn=self.conn, cmd=cmd, path=self.path, parsed_output=False)
 		except:
 			print(f"{self.hn} : Error executing command {cmd}")
+			self.cmd_exec_logs[-1]['raw'] = False
 			return None
+		try:
+			cmdObj.banner = banner		
+			file = cmdObj.op_to_file(cumulative=cumulative)
+			self.cmd_exec_logs[-1]['raw'] = True
+			return cmdObj
+		except:
+			print(f"{self.hn} : Error writing output for command {cmd}\n{cmdObj.output}")
+			print(self.cmd_exec_logs)
+			self.cmd_exec_logs[-1]['raw'] = False
+			return False
+
+	def _cmd_capture_parsed(self, cmd, cumulative=False, banner=False):
+		try:
+			cmdObj_parsed = COMMAND(conn=self.conn, cmd=cmd, path=self.path, parsed_output=True)
+		except:
+			print(f"{self.hn} : Error executing command - Run2 {cmd}")
+			self.cmd_exec_logs[-1]['parsed'] = False
+			return None
+		try:
+			self.parsed_cmd_df[cmd] = pd.DataFrame(cmdObj_parsed.output)
+			self.cmd_exec_logs[-1]['parsed'] = True
+		except:
+			print(f"{self.hn} : Error parsing output for command {cmd}")
+			print(f"{self.hn} : data facts may not be available for command: {cmd}\n{cmdObj_parsed.output}")
+			self.cmd_exec_logs[-1]['parsed'] = False
+			return False
 
 
 
@@ -558,7 +605,7 @@ class Captures(CLP):
 
 	"""    	
 
-	def __init__(self, dtype, conn, cmds, path, cumulative=False):
+	def __init__(self, dtype, conn, cmds, path, cumulative=False, parsed_output=False):
 		"""Initiate captures
 
 		Args:
@@ -567,8 +614,9 @@ class Captures(CLP):
 			cmds (set, list, tuple): set of commands 
 			path (str): path to store the captured output
 			cumulative (bool, optional): True/False/both. Defaults to False.
+			parsed_output(bool): generate parsed excel database for the device for the captures.
 		"""    		
-		super().__init__(dtype, conn, path)
+		super().__init__(dtype, conn, path, parsed_output)
 		self.cmds = cmds
 		self.op = ''
 		self.cumulative = cumulative
@@ -597,3 +645,22 @@ class Captures(CLP):
 			cmd_line = self.hn + ">" + cmd + "\n"
 			self.op += cmd_line + "\n" + output + "\n\n"
 			banner = ""
+
+	def add_exec_logs(self):
+		"""creates a dataframe for log tab on excel parsed output 
+		--> None
+		"""
+		self.parsed_cmd_df['logs'] = pd.DataFrame(self.cmd_exec_logs)
+
+	def write_facts(self):
+		"""write out the parsed outputs in excel database. each command output will create a separate excel tab.
+		--> None
+		"""
+		try:
+			self.add_exec_logs()
+			xl_file = self.path + self.conn.hn + ".xlsx"
+			print(f"writing facts to excel: {xl_file}")
+			append_to_xl(xl_file, self.parsed_cmd_df, overwrite=True)
+			print(f"facts write to excel: {xl_file} ...success!")
+		except:
+			print(f"facts write to excel: {xl_file} ...failed!")

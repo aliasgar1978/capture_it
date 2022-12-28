@@ -25,4 +25,6 @@ Inherited python packages
 	* nettoolkit
 	* netmiko
 	* paramiko
+	* pandas
+	* ntc-templates
 

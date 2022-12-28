@@ -11,7 +11,7 @@ class Execute_By_Login(Multi_Execution):
 
 	"""    	
 
-	def __init__(self, ip_list, auth, cmds, path, cumulative=False, forced_login=False):
+	def __init__(self, ip_list, auth, cmds, path, cumulative=False, forced_login=False, parsed_output=False):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
 		Args:
@@ -22,6 +22,8 @@ class Execute_By_Login(Multi_Execution):
 			cumulative (bool, optional): True: will store all commands output in a single file, 
 				False will store each command output in differet file. Defaults to False.
 				and 'both' will do both.
+			forced_login(bool): try to login to device via ssh even if ping was failed.
+			parsed_output(bool): generate the excel database file for the device for the captured outputs. ( database will be generated for which the parser functions are available )
 
 		Raises:
 			Exception: raise exception if any issue with authentication or connections.
@@ -34,6 +36,7 @@ class Execute_By_Login(Multi_Execution):
 		self.path = path
 		self.cumulative = cumulative
 		self.forced_login = forced_login
+		self.parsed_output = parsed_output
 		super().__init__(self.devices)
 		self.start()
 		# self.end()
@@ -62,4 +65,4 @@ class Execute_By_Login(Multi_Execution):
 		"""    		
 		Execute_Device(hn, auth=self.auth, 
 			cmds=self.cmds, path=self.path, cumulative=self.cumulative,
-			forced_login=self.forced_login)
+			forced_login=self.forced_login, parsed_output=self.parsed_output)
