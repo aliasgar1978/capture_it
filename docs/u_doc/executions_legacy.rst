@@ -9,10 +9,11 @@ Execution Steps
 ----------------------------------------------
 
 	#. Import project module
-	#. Provide auth para
-	#. List eligible devices
-	#. List commands to be captured
-	#. provide output path
+	#. Define Inputs
+		* Authentication parameters
+		* List of all eligible devices
+		* List of all commands to be captured (model wise)
+		* Output path
 	#. execute
 
 Execution Steps - Explained
@@ -63,7 +64,7 @@ Execution Steps - Explained
 			# .. edit as need  
 		]
 		JUNIPER_JUNOS_CMDS = [
-			# 'show configuration | no-more',
+			'show configuration | no-more',
 			'show lldp neighbors | no-more',
 			'show interfaces descriptions | no-more',
 			# .. edit as need 
@@ -84,34 +85,34 @@ Execution Steps - Explained
 		}
 
 
-	use: `arista_eos` key for the Arista switches commands list to be added to dictionary.
+		Note: **arista_eos** key for the Arista switches commands list to be added to dictionary.
 
 
 
 	#. Start Capturing::
 
 		capture(devices,				## List of devices 
-				auth, 					## Authentication parameters (dict)
-				cmds, 					## Dictionary of list of commands ( see above example )
-				op_path,				## output path - to store the outputs. 
-				cumulative=True, 		## True/False/Both (store output in a single file, individual command file, both)
-				forced_login=False, 	## True/False (True: try to ssh/login device even if ping responce fails. )
-				parsed_output=False,	## True/False (True: Evaluate and parse the command outputs to store device data in excel)
-				parse_n_clean=False		## True/False (True: evaluate parsed output and modify it)
+			auth, 		## Authentication parameters (dict)
+			cmds, 		## Dictionary of list of commands ( see above example )
+			op_path,	## output path - to store the outputs. 
+			cumulative=True, 	## True/False/Both (store output in a single file, individual command file, both)
+			forced_login=False, 	## True/False (True: try to ssh/login device even if ping responce fails. )
+			parsed_output=False,	## True/False (True: Evaluate and parse the command outputs to store device data in excel)
+			parse_n_clean=False	## True/False (True: evaluate parsed output and modify it)
 		)
 
 .. important::
 	
-	Parameters
+	``Parameters``
 
-	* devices = list of ip addresses
-	* auth = authentication Parameters
-	* cmds = dictionary of list of commands to be captred (cisco, juniper, arista).
-	* op_path = output path ( use "." for storing in same relative folder )
-	* cumulative = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
-	* forced_login=(Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
-	* parsed_output=(Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
-	* parse_n_clean=(Options: True, False) (Default: False) Evaluates the data from parsed output, merges the relevent tab and generates a new Gene file.
+	* *devices* = list of ip addresses
+	* *auth* = authentication Parameters
+	* *cmds* = dictionary of list of commands to be captred (cisco, juniper, arista).
+	* *op_path* = output path ( use "." for storing in same relative folder )
+	* *cumulative* = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
+	* *forced_login* = (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
+	* *parsed_output* = (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
+	* *parse_n_clean* = (Options: True, False) (Default: False) Evaluates the data from parsed output, merges the relevent tab and generates a new Gene file.
 
 -----------------------
 

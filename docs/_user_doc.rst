@@ -7,4 +7,4 @@ User documentation!
    :caption: Contents:
 
 
-   Executions - Old Way <u_doc/executions_legacy>
+   Executions <u_doc/executions_legacy>
