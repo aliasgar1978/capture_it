@@ -11,7 +11,16 @@ class Execute_By_Login(Multi_Execution):
 
 	"""    	
 
-	def __init__(self, ip_list, auth, cmds, path, cumulative=False, forced_login=False, parsed_output=False):
+	def __init__(self, 
+		ip_list, 
+		auth, 
+		cmds, 
+		path, 
+		cumulative=False, 
+		forced_login=False, 
+		parsed_output=False,
+		parse_n_clean=False
+		):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
 		Args:
@@ -22,8 +31,13 @@ class Execute_By_Login(Multi_Execution):
 			cumulative (bool, optional): True: will store all commands output in a single file, 
 				False will store each command output in differet file. Defaults to False.
 				and 'both' will do both.
-			forced_login(bool): try to login to device via ssh even if ping was failed.
-			parsed_output(bool): generate the excel database file for the device for the captured outputs. ( database will be generated for which the parser functions are available )
+			forced_login (bool, optional): True: will try to ssh/login to devices even if ping respince fails.
+				False will try to ssh/login only if ping responce was success. (default: False)
+			parsed_output (bool, optional): True: will check the captures and generate the general parsed excel file.
+				False will omit this step. No excel will be generated in the case. (default: False)
+			parse_n_clean (bool, optional): True: will parse as well as cleans/filters the output. A new Excel will be
+				generated with a few additional information, and a few unwanted details removed.
+				False will omit this step. (default: False)
 
 		Raises:
 			Exception: raise exception if any issue with authentication or connections.
@@ -37,6 +51,10 @@ class Execute_By_Login(Multi_Execution):
 		self.cumulative = cumulative
 		self.forced_login = forced_login
 		self.parsed_output = parsed_output
+		self.parse_n_clean = parse_n_clean
+		if parse_n_clean: self.parsed_output = True
+		if (parse_n_clean or parsed_output) and not cumulative :
+			self.cumulative='both'
 		super().__init__(self.devices)
 		self.start()
 		# self.end()
@@ -63,6 +81,12 @@ class Execute_By_Login(Multi_Execution):
 		Args:
 			hn (str): ip address of a reachable device
 		"""    		
-		Execute_Device(hn, auth=self.auth, 
-			cmds=self.cmds, path=self.path, cumulative=self.cumulative,
-			forced_login=self.forced_login, parsed_output=self.parsed_output)
+		Execute_Device(hn, 
+			auth=self.auth, 
+			cmds=self.cmds, 
+			path=self.path, 
+			cumulative=self.cumulative,
+			forced_login=self.forced_login, 
+			parsed_output=self.parsed_output,
+			parse_n_clean=self.parse_n_clean
+			)
