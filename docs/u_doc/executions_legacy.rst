@@ -5,7 +5,7 @@ Execution Steps
 
 
 
-Execution Steps - High Level
+Execution Steps
 ----------------------------------------------
 
 	#. Import project module
@@ -15,7 +15,7 @@ Execution Steps - High Level
 	#. provide output path
 	#. execute
 
-Execution Steps - Detailed
+Execution Steps - Explained
 ----------------------------------------------
 
 	#. Import the necessary module::
