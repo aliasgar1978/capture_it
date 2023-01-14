@@ -6,7 +6,9 @@ import paramiko, traceback
 import pandas as pd
 from time import sleep
 from nettoolkit import STR, IO, IP, LOG
-from .database import append_to_xl
+from facts_finder.database import append_to_xl
+from facts_finder import evaluate
+
 # -----------------------------------------------------------------------------
 
 BAD_CONNECTION_MSG = ': BAD CONNECTION DETECTED, TEARED DOWN'
@@ -273,7 +275,6 @@ class COMMAND():
 			conn (conn): connection object
 			cmd (str): a command to be executed
 			path (str): path where output to be stored
-			parsed_output(bool): generate parsed excel database for the command
 		"""    		
 		self.conn = conn
 		self.cmd = cmd
@@ -291,8 +292,9 @@ class COMMAND():
 		Returns:
 			str: file name where output get stored
 		"""    		
-		if cumulative:			
-			self.fname = self.add_to_file(self.commandOP)    # add to file		
+		if cumulative:
+			self.cumulative_filename = self.add_to_file(self.commandOP)    # add to file
+			self.fname = self.cumulative_filename
 			print(self.cmd, ">> ", self.fname)
 		else:
 			self.fname = self.send_to_file(self.commandOP)    # save to file
@@ -376,7 +378,16 @@ class Execute_Device():
 		cumulative (bool, optional): True,False,both. Defaults to False.
 	"""    	
 
-	def __init__(self, ip, auth, cmds, path, cumulative=False, forced_login=False, parsed_output=False):
+	def __init__(self, 
+		ip, 
+		auth, 
+		cmds, 
+		path, 
+		cumulative, 
+		forced_login, 
+		parsed_output,
+		parse_n_clean,
+		):
 		"""initialize execution
 
 		Args:
@@ -385,16 +396,15 @@ class Execute_Device():
 			cmds (list, set, tuple): set of commands to be executed.
 			path (str): path where output to be stored
 			cumulative (bool, optional): True,False,both. Defaults to False.
-			forced_login(bool): try to login/ssh device even if ping responce fails.
-			parsed_output(bool): generate parsed excel database for the device for show commands.
-		
 		"""    		
 		self.auth = auth
 		self.cmds = cmds
 		self.path = path
 		self.cumulative = cumulative
+		self.cumulative_filename = None
 		self.forced_login = forced_login
 		self.parsed_output = parsed_output
+		self.parse_n_clean = parse_n_clean
 		self.delay_factor, self.dev = None, None
 		pinging = self.check_ping(ip)
 		if forced_login or pinging:
@@ -437,7 +447,8 @@ class Execute_Device():
 				un=self.auth['un'], 
 				pw=self.auth['pw'])
 			return self.dev
-		except:
+		except Exception as e:
+			print(f'{ip}: {e}')
 			return None
 
 	def is_connected(self, c):
@@ -470,7 +481,11 @@ class Execute_Device():
 					) as c:
 			if self.is_connected(c):
 				cc = self.command_capture(c)
-				if self.parsed_output: cc.write_facts()
+				self.cumulative_filename = cc.cumulative_filename
+				if self.parsed_output: 
+					xl_file = cc.write_facts()
+				if self.parse_n_clean:
+					cc.clean(xl_file, self.cumulative_filename)
 
 	def command_capture(self, c):
 		"""start command captures on connection object
@@ -505,13 +520,13 @@ class CLP():
 		Args:
 			dtype (str): device type
 			conn (conn): connection object
-			path (str): path to store the captured output
-			parsed_output(bool): generate parsed excel database for the device for all commands.				
+			path (str): path to store the captured output	
 		"""    		
 		self.dtype = dtype
 		self.conn = conn
 		self.path = path
 		self.parsed_output = parsed_output
+		self.cumulative_filename = None
 		self.parsed_cmd_df = {}
 		self.cmd_exec_logs = []
 		self.hn = self.conn.hn
@@ -568,6 +583,8 @@ class CLP():
 			cmdObj.banner = banner		
 			file = cmdObj.op_to_file(cumulative=cumulative)
 			self.cmd_exec_logs[-1]['raw'] = True
+			if self.cumulative_filename is None:
+				self.cumulative_filename = cmdObj.cumulative_filename
 			return cmdObj
 		except:
 			print(f"{self.hn} : Error writing output for command {cmd}\n{cmdObj.output}")
@@ -579,7 +596,7 @@ class CLP():
 		try:
 			cmdObj_parsed = COMMAND(conn=self.conn, cmd=cmd, path=self.path, parsed_output=True)
 		except:
-			print(f"{self.hn} : Error executing command - Run2 {cmd}")
+			print(f"{self.hn} : Error executing command - Parse Run {cmd}")
 			self.cmd_exec_logs[-1]['parsed'] = False
 			return None
 		try:
@@ -587,7 +604,7 @@ class CLP():
 			self.cmd_exec_logs[-1]['parsed'] = True
 		except:
 			print(f"{self.hn} : Error parsing output for command {cmd}")
-			print(f"{self.hn} : data facts may not be available for command: {cmd}\n{cmdObj_parsed.output}")
+			print(f"{self.hn} : data facts may not be available for command: {cmd}")
 			self.cmd_exec_logs[-1]['parsed'] = False
 			return False
 
@@ -614,12 +631,12 @@ class Captures(CLP):
 			cmds (set, list, tuple): set of commands 
 			path (str): path to store the captured output
 			cumulative (bool, optional): True/False/both. Defaults to False.
-			parsed_output(bool): generate parsed excel database for the device for the captures.
 		"""    		
 		super().__init__(dtype, conn, path, parsed_output)
 		self.cmds = cmds
 		self.op = ''
 		self.cumulative = cumulative
+		self.cumulative_filename = None
 		self.grp_cmd_capture()
 
 
@@ -646,21 +663,34 @@ class Captures(CLP):
 			self.op += cmd_line + "\n" + output + "\n\n"
 			banner = ""
 
+
+			# break
+
 	def add_exec_logs(self):
-		"""creates a dataframe for log tab on excel parsed output 
-		--> None
-		"""
 		self.parsed_cmd_df['logs'] = pd.DataFrame(self.cmd_exec_logs)
 
 	def write_facts(self):
-		"""write out the parsed outputs in excel database. each command output will create a separate excel tab.
-		--> None
+		"""writes commands facts in to excel tab
 		"""
 		try:
 			self.add_exec_logs()
 			xl_file = self.path + self.conn.hn + ".xlsx"
-			print(f"writing facts to excel: {xl_file}")
+			print(f"writing facts to excel: {xl_file}", end="\t")
 			append_to_xl(xl_file, self.parsed_cmd_df, overwrite=True)
-			print(f"facts write to excel: {xl_file} ...success!")
+			print(f"...success!")
 		except:
-			print(f"facts write to excel: {xl_file} ...failed!")
+			print(f" ...failed!")
+		return xl_file
+
+
+	def clean(self, xl_file, cumulative_filename):
+		"""cleans excel fact file. removes some unwanted and adds a few more details.  Creates a new Gene file.
+		"""
+		ev = evaluate(
+			capture_log_file=cumulative_filename,
+			capture_file=xl_file,
+			cisco_var_column_mapper_file=None,
+			cisco_int_column_mapper_file=None,
+			juniper_column_mapper_file=None,
+			)
+		return ev
