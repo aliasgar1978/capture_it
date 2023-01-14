@@ -23,6 +23,7 @@ Inherited python packages / Backend support
 ===========================================
 
 	* nettoolkit
+	* facts_finder
 	* netmiko
 	* paramiko
 	* pandas

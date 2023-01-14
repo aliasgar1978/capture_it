@@ -15,7 +15,7 @@ docs_extras = [
 
 setuptools.setup(
     name="capture_it",
-    version="0.0.9",
+    version="0.0.10",
     author="ALIASGAR - ALI",
     author_email="aholo2000@gmail.com",
     description="Excel Facts File Generate from Networking Device Output|Config",
@@ -29,7 +29,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
-    install_requires= ['nettoolkit', 'paramiko', 'netmiko', 'pandas', 'ntc-templates'],
+    install_requires= ['nettoolkit','facts_finder', 'paramiko', 'netmiko', 'pandas', 'ntc-templates'],
     extras_require={'docs': docs_extras},
 )
 
