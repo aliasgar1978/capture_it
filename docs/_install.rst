@@ -23,7 +23,6 @@ Inherited python packages / Backend support
 ===========================================
 
 	* nettoolkit >= 0.0.17
-	* facts_finder >= 0.0.7
 	* netmiko
 	* paramiko
 	* pandas
