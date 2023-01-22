@@ -22,8 +22,8 @@ Install the capture_it package::
 Inherited python packages / Backend support
 ===========================================
 
-	* nettoolkit
-	* facts_finder
+	* nettoolkit >= 0.0.17
+	* facts_finder >= 0.0.7
 	* netmiko
 	* paramiko
 	* pandas

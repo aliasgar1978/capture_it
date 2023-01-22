@@ -19,7 +19,6 @@ class Execute_By_Login(Multi_Execution):
 		cumulative=False, 
 		forced_login=False, 
 		parsed_output=False,
-		parse_n_clean=False
 		):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
@@ -35,9 +34,6 @@ class Execute_By_Login(Multi_Execution):
 				False will try to ssh/login only if ping responce was success. (default: False)
 			parsed_output (bool, optional): True: will check the captures and generate the general parsed excel file.
 				False will omit this step. No excel will be generated in the case. (default: False)
-			parse_n_clean (bool, optional): True: will parse as well as cleans/filters the output. A new Excel will be
-				generated with a few additional information, and a few unwanted details removed.
-				False will omit this step. (default: False)
 
 		Raises:
 			Exception: raise exception if any issue with authentication or connections.
@@ -51,9 +47,7 @@ class Execute_By_Login(Multi_Execution):
 		self.cumulative = cumulative
 		self.forced_login = forced_login
 		self.parsed_output = parsed_output
-		self.parse_n_clean = parse_n_clean
-		if parse_n_clean: self.parsed_output = True
-		if (parse_n_clean or parsed_output) and not cumulative :
+		if parsed_output and not cumulative :
 			self.cumulative='both'
 		super().__init__(self.devices)
 		self.start()
@@ -88,5 +82,4 @@ class Execute_By_Login(Multi_Execution):
 			cumulative=self.cumulative,
 			forced_login=self.forced_login, 
 			parsed_output=self.parsed_output,
-			parse_n_clean=self.parse_n_clean
 			)

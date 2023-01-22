@@ -5,9 +5,7 @@ from netmiko import ConnectHandler
 import paramiko, traceback
 import pandas as pd
 from time import sleep
-from nettoolkit import STR, IO, IP, LOG
-from facts_finder.database import append_to_xl
-from facts_finder import evaluate
+from nettoolkit import STR, IO, IP, LOG, append_to_xl
 
 # -----------------------------------------------------------------------------
 
@@ -295,10 +293,10 @@ class COMMAND():
 		if cumulative:
 			self.cumulative_filename = self.add_to_file(self.commandOP)    # add to file
 			self.fname = self.cumulative_filename
-			print(self.cmd, ">> ", self.fname)
+			print(self.conn.hn, ": ", self.cmd, ">> ", self.fname)
 		else:
 			self.fname = self.send_to_file(self.commandOP)    # save to file
-			print(self.cmd, ">> ", self.fname)
+			print(self.conn.hn, ": ", self.cmd, ">> ", self.fname)
 		if isinstance(cumulative, str) and cumulative=='both':
 			self.fname = self.send_to_file(self.commandOP)    # save to file
 		return self.fname
@@ -386,7 +384,6 @@ class Execute_Device():
 		cumulative, 
 		forced_login, 
 		parsed_output,
-		parse_n_clean,
 		):
 		"""initialize execution
 
@@ -404,7 +401,6 @@ class Execute_Device():
 		self.cumulative_filename = None
 		self.forced_login = forced_login
 		self.parsed_output = parsed_output
-		self.parse_n_clean = parse_n_clean
 		self.delay_factor, self.dev = None, None
 		pinging = self.check_ping(ip)
 		if forced_login or pinging:
@@ -413,7 +409,8 @@ class Execute_Device():
 				self.dev.dtype
 			except:
 				print(f"DeviceType not detected for {ip}")
-			if self.dev is not None and self.dev.dtype == 'cisco_ios': sleep(65)
+			if self.dev is not None and self.dev.dtype == 'cisco_ios': 
+				sleep(65)
 			self.execute(ip)
 
 
@@ -484,8 +481,6 @@ class Execute_Device():
 				self.cumulative_filename = cc.cumulative_filename
 				if self.parsed_output: 
 					xl_file = cc.write_facts()
-				if self.parse_n_clean:
-					cc.clean(xl_file, self.cumulative_filename)
 
 	def command_capture(self, c):
 		"""start command captures on connection object
@@ -587,7 +582,9 @@ class CLP():
 				self.cumulative_filename = cmdObj.cumulative_filename
 			return cmdObj
 		except:
-			print(f"{self.hn} : Error writing output for command {cmd}\n{cmdObj.output}")
+			print(f"{self.hn} : Error writing output for command {cmd}\n",
+					f"{cmdObj.output}"
+					)
 			print(self.cmd_exec_logs)
 			self.cmd_exec_logs[-1]['raw'] = False
 			return False
@@ -603,8 +600,8 @@ class CLP():
 			self.parsed_cmd_df[cmd] = pd.DataFrame(cmdObj_parsed.output)
 			self.cmd_exec_logs[-1]['parsed'] = True
 		except:
-			print(f"{self.hn} : Error parsing output for command {cmd}")
-			print(f"{self.hn} : data facts may not be available for command: {cmd}")
+			print(f"{self.hn} : No ntc-template parser available for the output of command {cmd}")
+			print(f"{self.hn} : data facts will not be available for this command: {cmd}")
 			self.cmd_exec_logs[-1]['parsed'] = False
 			return False
 
@@ -674,7 +671,7 @@ class Captures(CLP):
 		"""
 		try:
 			self.add_exec_logs()
-			xl_file = self.path + self.conn.hn + ".xlsx"
+			xl_file = self.path + "/" + self.conn.hn + ".xlsx"
 			print(f"writing facts to excel: {xl_file}", end="\t")
 			append_to_xl(xl_file, self.parsed_cmd_df, overwrite=True)
 			print(f"...success!")
@@ -683,14 +680,3 @@ class Captures(CLP):
 		return xl_file
 
 
-	def clean(self, xl_file, cumulative_filename):
-		"""cleans excel fact file. removes some unwanted and adds a few more details.  Creates a new Gene file.
-		"""
-		ev = evaluate(
-			capture_log_file=cumulative_filename,
-			capture_file=xl_file,
-			cisco_var_column_mapper_file=None,
-			cisco_int_column_mapper_file=None,
-			juniper_column_mapper_file=None,
-			)
-		return ev

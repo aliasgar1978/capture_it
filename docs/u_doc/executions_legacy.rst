@@ -98,7 +98,6 @@ Execution Steps - Explained
 			cumulative=True, 	## True/False/Both (store output in a single file, individual command file, both)
 			forced_login=False, 	## True/False (True: try to ssh/login device even if ping responce fails. )
 			parsed_output=False,	## True/False (True: Evaluate and parse the command outputs to store device data in excel)
-			parse_n_clean=False	## True/False (True: evaluate parsed output and modify it)
 		)
 
 .. important::
@@ -112,7 +111,6 @@ Execution Steps - Explained
 	* *cumulative* = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
 	* *forced_login* = (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
 	* *parsed_output* = (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
-	* *parse_n_clean* = (Options: True, False) (Default: False) Evaluates the data from parsed output, merges the relevent tab and generates a new Gene file.
 
 -----------------------
 
