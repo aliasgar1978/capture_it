@@ -85,7 +85,7 @@ Execution Steps - Explained
 		}
 
 
-		Note: **arista_eos** key for the Arista switches commands list to be added to dictionary.
+		Note: ``arista_eos`` key for the Arista switches commands list to be added to dictionary.
 
 
 
