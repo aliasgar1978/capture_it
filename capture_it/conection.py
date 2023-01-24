@@ -409,9 +409,14 @@ class Execute_Device():
 				self.dev.dtype
 			except:
 				print(f"DeviceType not detected for {ip}")
-			if self.dev is not None and self.dev.dtype == 'cisco_ios': 
-				sleep(65)
-			self.execute(ip)
+			if self.dev is not None and self.dev.dtype == 'cisco_ios':
+				try:
+					self.execute(ip)
+				except:
+					sleep(65)
+					self.execute(ip)
+			else:
+				self.execute(ip)
 
 
 	def check_ping(self, ip):
