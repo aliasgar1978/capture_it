@@ -19,6 +19,7 @@ class Execute_By_Login(Multi_Execution):
 		cumulative=False, 
 		forced_login=False, 
 		parsed_output=False,
+		concurrent_connections=100,
 		):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
@@ -50,6 +51,10 @@ class Execute_By_Login(Multi_Execution):
 		if parsed_output and not cumulative :
 			self.cumulative='both'
 		super().__init__(self.devices)
+		try:
+			self.max_connections = concurrent_connections
+		except:
+			print(f"Invalid number of `concurrent_connections` defined {concurrent_connections}, default 100 take.")
 		self.start()
 		# self.end()
 
