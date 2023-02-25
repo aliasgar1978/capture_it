@@ -409,7 +409,7 @@ class Execute_Device():
 				self.dev.dtype
 			except:
 				print(f"DeviceType not detected for {ip}")
-			if self.dev is not None and self.dev.dtype == 'cisco_ios':
+			if self.dev is not None and self.dev.dtype == 'cisco_ios': 
 				try:
 					self.execute(ip)
 				except:
@@ -447,7 +447,8 @@ class Execute_Device():
 		try:
 			self.dev = DeviceType(dev_ip=ip, 
 				un=self.auth['un'], 
-				pw=self.auth['pw'])
+				pw=self.auth['pw'],
+			)
 			return self.dev
 		except Exception as e:
 			print(f'{ip}: {e}')

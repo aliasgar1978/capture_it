@@ -35,6 +35,8 @@ class Execute_By_Login(Multi_Execution):
 				False will try to ssh/login only if ping responce was success. (default: False)
 			parsed_output (bool, optional): True: will check the captures and generate the general parsed excel file.
 				False will omit this step. No excel will be generated in the case. (default: False)
+			concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
+				default is 100.
 
 		Raises:
 			Exception: raise exception if any issue with authentication or connections.
@@ -54,7 +56,7 @@ class Execute_By_Login(Multi_Execution):
 		try:
 			self.max_connections = concurrent_connections
 		except:
-			print(f"Invalid number of `concurrent_connections` defined {concurrent_connections}, default 100 take.")
+			print(f"Invalid number of `concurrent_connections` defined {concurrent_connections}, default 100 taken.")
 		self.start()
 		# self.end()
 
