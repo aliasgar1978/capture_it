@@ -7,4 +7,5 @@ User documentation!
    :caption: Contents:
 
 
-   Executions <u_doc/executions_legacy>
+   Execution-Common <u_doc/executions_legacy>
+   Execution-Individual <u_doc/executions_individual>

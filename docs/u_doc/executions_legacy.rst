@@ -1,11 +1,11 @@
 
 
-Execution Steps
+Execution Steps - Common Commands for all devices
 =================================================
 
 
 
-Execution Steps
+Execution Steps - summary
 ----------------------------------------------
 
 	#. Import project module
@@ -112,7 +112,9 @@ Execution Steps - Explained
 	* *cumulative* = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
 	* *forced_login* = (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
 	* *parsed_output* = (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
-	* *concurrent_connections* = (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance. 
+	* *concurrent_connections* = (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance.
+
+	Since we are providing all commands at a time for all devices, Script will automatically identifies whether device is ``Cisco/Juniper/Arista`` and push respective commands to the system without needing to mention explicitly.
 
 -----------------------
 
