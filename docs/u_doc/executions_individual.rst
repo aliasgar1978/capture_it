@@ -49,8 +49,10 @@ Execution Steps - Explained
 
 		#. Multiple devices can be inserted as a tuple for dictionary keys.
 		#. One device can appear on multiple keys ( as stated in above example: 10.10.10.1).  List of commands from both  entries will be clubbed together to form a single list.
-		#. Alternativey create a separate group of commands based on device functionality (example: separate set of commands for each - access layers, core layers ).  
-		Create group of devices as a tuple based on device functionality.  And Using these two create a simple readable dictionary. 
+		#. Grouping
+			#. Create a separate group of commands based on device functionality (example: separate set of commands for each - access layers, core layers ). 
+			#. Create group of devices as a tuple based on device functionality.  
+			#. Using these above two - create a simple readable dictionary. 
 
 
 
