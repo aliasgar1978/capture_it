@@ -651,7 +651,13 @@ class Captures(CLP):
 			None: None
 		"""    		
 		banner = self.conn.banner
-		for cmd  in self.cmds[self.dtype]:
+		#
+		if isinstance(self.cmds, dict):
+			commands = self.cmds[self.dtype] 
+		if isinstance(self.cmds, (set, list, tuple)):
+			commands = self.cmds 
+		#
+		for cmd  in commands:
 			# try:
 			if not self.check_config_authorization(cmd): 
 				print(f"UnAuthorizedCommandDetected-{cmd}-EXECUTIONHALTED")
