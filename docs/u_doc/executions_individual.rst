@@ -45,7 +45,7 @@ Execution Steps - Explained
 		}
 
 
-		..Tip ::
+		.. Tip::
 
 			#. Multiple devices can be inserted as a tuple for dictionary keys.
 			#. One device can appear on multiple keys ( as stated in above example: 10.10.10.1).  List of commands from both  entries will be clubbed together to form a single list.
