@@ -76,7 +76,7 @@ Execution Steps - Explained
 
 A SAMPLE EXECUTION FILE IN SUMMARY WILL LOOK LIKE THIS.
 
-:ref:`exec-capture_it-Individual.py<files/exec-capture_it-Individual.py>`.
+:download:`exec-capture_it-Individual.py <files/exec-capture_it-Individual.py>`.
 
 
 
