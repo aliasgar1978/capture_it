@@ -73,6 +73,13 @@ Execution Steps - Explained
 			concurrent_connections=100,    ## numeric value (default:100), number of simultaneous device connections in a group. 
 		)
 
+
+A SAMPLE EXECUTION FILE IN SUMMARY WILL LOOK LIKE THIS.
+
+:ref:`exec-capture_it-Individual.py<files/exec-capture_it-Individual.py>`.
+
+
+
 .. important::
 	
 	``Parameters``
