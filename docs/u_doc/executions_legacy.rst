@@ -102,17 +102,6 @@ Execution Steps - Explained
 		)
 
 
-A SAMPLE EXECUTION FILE.
-----------------------------------------------
-
-A sample execution file will look similar to this. Either maintain the tree structure as mentioned in file or modify the code as per your requirement. 
-
-:download:`exec-capture_it-Common.py <files/exec-capture_it-Common.py>`.
-
-:download:`cisco_cmds_txtfsm.txt <files/cisco_cmds_txtfsm.txt>`.
-
-:download:`juniper_cmds_txtfsm.txt <files/juniper_cmds_txtfsm.txt>`.
-
 
 .. important::
 	
