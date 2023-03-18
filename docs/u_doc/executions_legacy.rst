@@ -5,7 +5,7 @@ Execution Steps - Common Commands for all devices
 
 
 
-Execution Steps - summary
+Execution Steps - summary (common)
 ----------------------------------------------
 
 	#. Import project module
@@ -16,7 +16,7 @@ Execution Steps - summary
 		* Output path
 	#. execute
 
-Execution Steps - Explained
+Execution Steps - Explained (common)
 ----------------------------------------------
 
 	#. Import the necessary module::

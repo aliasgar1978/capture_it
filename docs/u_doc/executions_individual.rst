@@ -5,7 +5,7 @@ Execution Steps - Separate Commands for each individual devices
 
 
 
-Execution Steps - summary
+Execution Steps - summary (individual)
 ----------------------------------------------
 
 	#. Import project module
@@ -15,7 +15,7 @@ Execution Steps - summary
 		* Output path 
 	#. execute
 
-Execution Steps - Explained
+Execution Steps - Explained (individual)
 ----------------------------------------------
 
 	#. Import the necessary module::
