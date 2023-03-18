@@ -49,7 +49,7 @@ auth = { 'un':un , 'pw':pw , 'en':pw }
 #          devices/commands dictionary
 # ------------------------------------------------
 #
-df_dict = read_xl(f'{commands_folder}/devices_cmds.xlsx')
+df_dict = read_xl(f'{commands_folder}/devices_cmds.xlsx')        ### file with ips and commands.
 #
 devices_command_dict = {}
 for sht, df in df_dict:
