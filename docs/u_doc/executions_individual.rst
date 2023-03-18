@@ -74,14 +74,6 @@ Execution Steps - Explained
 		)
 
 
-A SAMPLE EXECUTION FILE.
-----------------------------------------------
-
-A sample execution file will look similar to this. Either maintain the tree structure as mentioned in file or modify the code as per your requirement. 
-
-:download:`exec-capture_it-Individual.py <files/exec-capture_it-Individual.py>`.
-
-
 
 .. important::
 	
