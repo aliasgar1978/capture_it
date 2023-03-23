@@ -75,6 +75,34 @@ Execution Steps - Explained (individual)
 
 
 
+
+A SAMPLE EXECUTION FILE.
+----------------------------------------------
+
+
+:download:`Sample Execution File - Individual <files/exec-capture_it-Individual.py>`. A sample execution file will look similar to this
+
+
+FOLDER TREE STRUCTURE
+----------------------------------------------
+
+	#. Either maintain the tree structure as mentioned in file or modify the code as per your requirement::
+
+		Parent
+		|
+		| - + myPrograms
+		|   | - exec-capture_it - Individual.py
+		|   | - cred.py ( contains login username (un), password (pw) )
+		|
+		| - + captures
+		|   | - [ output files ]	
+		|
+		| - + commands
+		    | - devices_cmds.xlsx
+
+
+
+
 .. important::
 	
 	``Parameters``
