@@ -11,6 +11,7 @@ Welcome to capture_it's documentation!
    Preface <docs/_preface>
    Install <docs/_install>
    User Manual <docs/_user_doc>
+   API Docs <docs/_tech_doc>
 
 
 
