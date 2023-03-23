@@ -74,6 +74,25 @@ Execution Steps - Explained (individual)
 		)
 
 
+	.. important::
+		
+		``Parameters``
+
+		* ``*auth*``  authentication Parameters
+
+		* ``*devices*``  dictionary of devices of list of commands to be captred for each individual device.  **Note since we are providing commands exclusively for each individual/set of device(s), Script will not auto check for device type.**
+
+		* ``*op_path*``  output path ( use "." for storing in same relative folder )
+
+		* ``*cumulative*``  (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
+
+		* ``*forced_login*``  (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
+
+		* ``*parsed_output*``  (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
+
+		* ``*concurrent_connections*``  (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance. 
+
+
 
 
 A SAMPLE EXECUTION FILE.
@@ -102,18 +121,6 @@ FOLDER TREE STRUCTURE
 
 
 
-
-.. important::
-	
-	``Parameters``
-
-	* *auth* = authentication Parameters
-	* *devices* = dictionary of devices of list of commands to be captred for each individual device.  **Note since we are providing commands exclusively for each individual/set of device(s), Script will not auto check for device type.**
-	* *op_path* = output path ( use "." for storing in same relative folder )
-	* *cumulative* = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
-	* *forced_login* = (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
-	* *parsed_output* = (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
-	* *concurrent_connections* = (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance. 
 
 -----------------------
 
