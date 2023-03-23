@@ -102,20 +102,56 @@ Execution Steps - Explained (common)
 		)
 
 
-.. important::
-	
-	``Parameters``
+	.. important::
+		
+		**Parameters**
 
-	* *devices* = list of ip addresses
-	* *auth* = authentication Parameters
-	* *cmds* = dictionary of list of commands to be captred (cisco, juniper, arista).
-	* *op_path* = output path ( use "." for storing in same relative folder )
-	* *cumulative* = (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
-	* *forced_login* = (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
-	* *parsed_output* = (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
-	* *concurrent_connections* = (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance.
+		* ``devices``  list of ip addresses
+		* ``auth``  authentication Parameters
+		* ``cmds``  dictionary of list of commands to be captred (cisco, juniper, arista).
+		* ``op_path``  output path ( use "." for storing in same relative folder )
+		* ``cumulative``  (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
+		* ``forced_login``  (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
+		* ``parsed_output``  (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
+		* ``concurrent_connections``  (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance.
 
-	Since we are providing all commands at a time for all devices, Script will automatically identifies whether device is ``Cisco/Juniper/Arista`` and push respective commands to the system without needing to mention explicitly.
+
+	.. important::
+		
+			Since we are providing all commands at a time for all devices, Script will automatically identifies whether device is ``Cisco/Juniper/Arista`` and push respective commands to the system without needing to mention explicitly.
+
+
+
+A SAMPLE EXECUTION FILE.
+----------------------------------------------
+
+
+:download:`Sample Execution File - Common <files/exec-capture_it-Common.py>`. A sample execution file will look similar to this
+
+:download:`List of CISCO Commands <files/cisco_cmds_txtfsm.txt>`. A sample command list file for cisco.
+
+:download:`List of JUNIPER Commands <files/juniper_cmds_txtfsm.txt>`. A sample command list file for juniper.
+
+
+FOLDER TREE STRUCTURE
+----------------------------------------------
+
+	#. Either maintain the tree structure as mentioned in file or modify the code as per your requirement::
+
+		Parent
+		|
+		| - + myPrograms
+		|   | - exec-capture_it-Common.py
+		|   | - cred.py ( contains login username (un), password (pw) )
+		|
+		| - + captures
+		|   | - [ output files ]  
+		|
+		| - + commands
+		    | - devices.txt (list of device ip addresses)
+		    | - cisco_cmds_txtfsm.txt (LIST OF CISCO COMMANDS TO BE CAPTURED)
+		    | - juniper_cmds_txtfsm.txt (LIST OF JUNIPER COMMANDS TO BE CAPTURED)
+
 
 -----------------------
 
