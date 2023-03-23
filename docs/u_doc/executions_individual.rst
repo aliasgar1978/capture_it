@@ -92,14 +92,14 @@ Execution Steps - Explained (individual)
 
 
 
-A SAMPLE EXECUTION FILE.
+A Sample Execution File
 ----------------------------------------------
 
 
 :download:`Sample Execution File - Individual <files/exec-capture_it-Individual.py>`. A sample execution file will look similar to this
 
 
-FOLDER TREE STRUCTURE
+Folder Tree Structure
 ----------------------------------------------
 
 	#. Either maintain the tree structure as mentioned in file or modify the code as per your requirement::
