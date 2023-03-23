@@ -30,6 +30,6 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires= ['nettoolkit>=0.0.17', 'paramiko', 'netmiko', 'pandas', 'ntc-templates'],
-    extras_require={'docs': docs_extras},
+    # extras_require={'docs': docs_extras},
 )
 
