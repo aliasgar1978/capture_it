@@ -167,7 +167,7 @@ class Execute_By_Individual_Commands(Multi_Execution):
 						raise Exception(f"`dev_cmd_dict` key expecting IPv4 address, received {ip}")
 			elif isinstance(ip, str) and not isinstance(addressing(ip), IPv4):
 				raise Exception(f"`dev_cmd_dict` key expecting IPv4 address, received {ip}")
-			if not isinstance(cmds, (list, set, tuple)):
+			if not isinstance(cmds, (list, set, tuple, dict)):
 				raise Exception(f"`dev_cmd_dict` values expecting iterable, received {cmds}")
 
 	def add_devices(self, dev_cmd_dict):
@@ -202,7 +202,6 @@ class Execute_By_Individual_Commands(Multi_Execution):
 		Args:
 			ip (str): ip address of a reachable device
 		"""
-		# print(ip, sorted(self.dev_cmd_dict[ip]) )
 		Execute_Device(ip, 
 			auth=self.auth, 
 			cmds=sorted(self.dev_cmd_dict[ip]), 

@@ -6,6 +6,7 @@ import paramiko, traceback
 import pandas as pd
 from time import sleep
 from nettoolkit import STR, IO, IP, LOG, append_to_xl
+from .common import *
 
 # -----------------------------------------------------------------------------
 
@@ -662,6 +663,10 @@ class Captures(CLP):
 			if not self.check_config_authorization(cmd): 
 				print(f"UnAuthorizedCommandDetected-{cmd}-EXECUTIONHALTED")
 				return None
+			# if juniper update no-more if unavailable.
+			if self.dtype == 'juniper_junos': 
+				cmd = juniper_add_no_more(cmd)
+			#
 			cc = self.cmd_capture(cmd, self.cumulative, banner)
 			# output = cc.commandOP #if cc else f": Error executing command {cmd}"
 			try:
