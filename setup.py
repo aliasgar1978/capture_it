@@ -15,10 +15,10 @@ docs_extras = [
 
 setuptools.setup(
     name="capture_it",
-    version="0.0.15",
+    version="0.0.16",
     author="ALIASGAR - ALI",
     author_email="aholo2000@gmail.com",
-    description="Excel Facts File Generate from Networking Device Output|Config",
+    description="Networking Device show output|Config capture and parsing utility",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/aliasgar1978/capture_it",
