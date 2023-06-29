@@ -1,8 +1,8 @@
 
-common module
+_conn module
 ---------------------------------------------------
 
-.. automodule:: capture_it.common
+.. automodule:: capture_it._conn
 	:members:
 	:undoc-members:
 	:show-inheritance:

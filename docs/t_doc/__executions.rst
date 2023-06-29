@@ -1,5 +1,5 @@
 
-executions
+executions modules
 ---------------------------------------------------
 
 .. automodule:: capture_it.executions

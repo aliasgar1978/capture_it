@@ -1,8 +1,8 @@
 
-common module
+_exec_device module
 ---------------------------------------------------
 
-.. automodule:: capture_it.common
+.. automodule:: capture_it._exec_device
 	:members:
 	:undoc-members:
 	:show-inheritance:

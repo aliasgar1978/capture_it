@@ -91,14 +91,21 @@ Execution Steps - Explained (common)
 
 	#. Start Capturing::
 
-		capture(devices,				## List of devices 
-			auth, 		## Authentication parameters (dict)
-			cmds, 		## Dictionary of list of commands ( see above example )
-			op_path,	## output path - to store the outputs. 
-			cumulative=True, 	## True/False/Both (store output in a single file, individual command file, both)
-			forced_login=False, 	## True/False (True: try to ssh/login device even if ping responce fails. )
-			parsed_output=False,	## True/False (True: Evaluate and parse the command outputs to store device data in excel)
-			concurrent_connections=100, 	## numeric value (default:100), number of simultaneous device connections in a group. 
+		capture(
+			## mandatory arguments ##
+			devices,    ## list of device ips
+			auth,       ## Authentication parameters (dict)
+			cmds,       ## Dictionary of list of commands ( see above example )
+			op_path,    ## output path - to store the outputs. 
+
+			## optional arguments ##
+			cumulative=True,        ## True/False/Both (store output in a single file, individual command file, both)
+			forced_login=False,     ## True/False (True: try to ssh/login device even if ping responce fails. )
+			parsed_output=False,    ## True/False (True: Evaluate and parse the command outputs to store device data in excel)
+			visual_progress=10,     ## display visual progress on console (default level: 3)
+			log_type='individual',  ## available options = ('common', individual', 'both', None) ( default: None)
+			common_log_file='common-debug.log',  ## provide if log_type is individual (default: None)
+			concurrent_connections=100,          ## numeric value (default:100), number of simultaneous device connections in a group. 
 		)
 
 
@@ -113,6 +120,9 @@ Execution Steps - Explained (common)
 		* ``cumulative``  (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
 		* ``forced_login``  (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
 		* ``parsed_output``  (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
+		* ``visual_progress`` (int, optional): 0 will show least progress, 10 will show all progress (default=3).
+		* ``log_type`` (str): what type of log output requires. choices are = common, individual, both
+		* ``common_log_file`` (str): output file name of a common log file
 		* ``concurrent_connections``  (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance.
 
 

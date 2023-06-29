@@ -1,8 +1,8 @@
 
-common module
+_detection module
 ---------------------------------------------------
 
-.. automodule:: capture_it.common
+.. automodule:: capture_it._detection
 	:members:
 	:undoc-members:
 	:show-inheritance:

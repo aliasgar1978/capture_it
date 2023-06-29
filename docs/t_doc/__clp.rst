@@ -1,8 +1,8 @@
 
-common module
+_clp module
 ---------------------------------------------------
 
-.. automodule:: capture_it.common
+.. automodule:: capture_it._clp
 	:members:
 	:undoc-members:
 	:show-inheritance:

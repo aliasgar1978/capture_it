@@ -1,9 +1,15 @@
 
+# --------------------------------------------
+# IMPORTS
+# --------------------------------------------
 from capture_it import capture
 from nettoolkit import *
 from pathlib import *
 import sys
 
+# --------------------------------------------
+# path / folder settings
+# --------------------------------------------
 p = Path(".")
 previous_path = p.resolve().parents[0]
 sys.path.insert(len(sys.path), str(previous_path))
@@ -17,7 +23,7 @@ TREE STRUCTURE
 
 Parent
 |
-| - + myPrograms
+| - + myPrograms / scripts
 |   | - exec-capture_it-Common.py
 |   | - cred.py ( contains login username (un), password (pw) )
 |
@@ -32,68 +38,79 @@ Parent
 
 """
 
-
 # --------------------------------------------
-# ------ USAGE OF Capture tool (config)  ...
+# Some Local Functions
 # --------------------------------------------
-#
-from cred import un, pw
-# un = get_username()   ## alternative
-# pw = get_password()
-#
-auth = {
-    'un':un ,
-    'pw':pw ,
-    'en':pw , 
-}
+
+# get the list of items.
+def get_item_list(file):
+  with open(file, 'r') as f:
+    lns = f.readlines() 
+  return [ _.strip() for _ in lns]
 
 
-# #------------------------------------------------
-# List of devices
+# get the list of devices, default all, or leg wise if provided.
+def get_devices(device_list_file):
+  devices = get_item_list(device_list_file)
+  return devices
 
-with open(f"{commands_folder}/devices.txt", 'r') as f:         #### LIST OF DEVICES IP ADDRESESSES
-  lns = f.readlines() 
-devices = [ _.strip() for _ in lns]
+# get the dictionary of list of commands
+def get_commands_list_dictionary(cisco_file, juniper_file, arista_file):
+  CISCO_IOS_CMDS = get_item_list(cisco_file)
+  JUNIPER_JUNOS_CMDS = get_item_list(juniper_file)
+  ARISTA_EOS_CMDS = get_item_list(arista_file)
+  return {
+    'cisco_ios'  : CISCO_IOS_CMDS,
+    'juniper_junos': JUNIPER_JUNOS_CMDS,
+    'arista_eos': ARISTA_EOS_CMDS,
+  }
 
-# #------------------------------------------------
-# Commands 
+# ------------------------------------------------------------------------------------------------------------
+#  EXECUTE
+# ------------------------------------------------------------------------------------------------------------
+if __name__ == '__main__':
 
-cisco_cmds = f"{commands_folder}/cisco_cmds_txtfsm.txt"       #### LIST OF CISCO COMMANDS TO BE CAPTURED.
-with open(cisco_cmds, 'r') as f:
-  lns = f.readlines() 
-CISCO_IOS_CMDS = [ _.strip() for _ in lns]
+  # --------------------------------------------
+  #    INPUT: Credentials
+  # --------------------------------------------
+  # option 1 ------------- ( import un/pw from a file )
+  from cred import un, pw
 
-# #------------------------------------------------
-# Commands 
+  # option 2 ------------- ( input manualy )
+  # un = get_username()
+  # pw = get_password()
 
-juniper_cmds = f'{commands_folder}/juniper_cmds_txtfsm.txt'   #### LIST OF JUNIPER COMMANDS TO BE CAPTURED.
-with open(juniper_cmds, 'r') as f:
-  lns = f.readlines() 
-JUNIPER_JUNOS_CMDS = [ _.strip() for _ in lns]
-# #------------------------------------------------
+  # authentication Dictionary -----------
+  auth = { 'un':un, 'pw':pw, 'en':pw }
 
+  # --------------------------------------------
+  #    INPUT: necessary files
+  # --------------------------------------------
+  device_list_file = f"{commands_folder}/devices.txt"
+  cisco_cmds_file = f"{commands_folder}/cisco_cmds_txtfsm.txt"
+  juniper_cmds_file = f'{commands_folder}/juniper_cmds_txtfsm.txt'
+  arista_cmds_file = f"{commands_folder}/cisco_cmds_txtfsm.txt"
 
-# ---- DEFINE COMMANDS LISTS PER DEVICE TYPES ----
-cmds = {
-  'cisco_ios'  : CISCO_IOS_CMDS,
-  'juniper_junos': JUNIPER_JUNOS_CMDS,
-  'arista_eos': CISCO_IOS_CMDS,
-}
-# ---- START CAPTURE ----
-capture(
-  devices, 
-  auth, 
-  cmds, 
-  path=capture_folder, 
-  cumulative=True,        # optional arg
-  forced_login=True,      # optional arg 
-  parsed_output=True,     # optional arg (def: False )
-  concurrent_connections=100,    # optional arg (def: 100)
-)
-
-# # #------------------------------------------------
-
-print("Capture Task(s) Complete..")
-# # #------------------------------------------------
+  # ---- get devices & commands  ----
+  devices = get_devices(device_list_file)
+  cmds = get_commands_list_dictionary(cisco_cmds_file, juniper_cmds_file, arista_cmds_file)
 
 
+  # ---- START CAPTURE ----
+  capture(
+    devices,                  # mandatory - list of devices
+    auth,                     # mandatory - authentication parameters dictionary
+    cmds,                     # mandatory - dictionary of list of commands
+    path=capture_folder,      # mandatory - output capture path
+    cumulative=True,                       # optional arg ( other options = False, 'both')
+    forced_login=True,                     # optional arg 
+    parsed_output=True,                    # optional arg (def: False)
+    visual_progress=11,                    # optional arg (def: 3)
+    log_type='both',                       # optional arg - options = 'common', individual', 'both', None ( def: None)
+    common_log_file='common-debug.log',    # optional arg if log_type is individual (def: None)
+    concurrent_connections=40              # optional arg (def: 100)
+  )
+  print("Capture Task(s) Complete..")
+  #------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------------------
