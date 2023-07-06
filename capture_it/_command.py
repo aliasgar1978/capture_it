@@ -56,18 +56,18 @@ class COMMAND():
 		Returns:
 			str: file name where output get stored
 		"""    		
-		if cumulative:
+		if cumulative is True or (isinstance(cumulative, str) and cumulative.lower() == 'both'):
 			self.cumulative_filename = self.add_to_file(self.commandOP)    # add to file
 			self.fname = self.cumulative_filename
 			msg_level, msg = 3, f"{self.conn.hn} : {self.cmd} >> {self.fname}"
 			visual_print(msg, msg_level, self.visual_progress, self.logger_list)
-		else:
+		if cumulative is False or (isinstance(cumulative, str) and cumulative.lower() == 'both'):
 			self.fname = self.send_to_file(self.commandOP)    # save to file
 			msg_level, msg = 3, f"{self.conn.hn} : {self.cmd} >> {self.fname}"
 			visual_print(msg, msg_level, self.visual_progress, self.logger_list)
-		if isinstance(cumulative, str) and cumulative=='both':
-			self.fname = self.send_to_file(self.commandOP)    # save to file
-		return self.fname
+		if cumulative is None:
+			print(self.commandOP)
+
 
 	# Representation of Command object
 	def __repr__(self):

@@ -57,8 +57,8 @@ class Execute_Common():
 		if not isinstance(self.visual_progress, (int, float)):
 			print(f"visual_progress level to be entered in number, default value (3) selected")
 			self.visual_progress = 3
-		if self.parsed_output and not self.cumulative :
-			self.cumulative='both'
+		if not self.cumulative in (True, False, 'both'):
+			print( f"cumulative arument is set to {self.cumulative}. No capture-log files will be generated." )
 		if self.log_type in ('common', 'both') and not self.common_log_file:
 			print( f"common_log_file is missing, debug log will not be generated" )
 			self.common_log_file = None

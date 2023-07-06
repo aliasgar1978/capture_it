@@ -22,7 +22,7 @@ copyright = '2022, ALIASGAR'
 author = 'ALIASGAR'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.16'
+release = '0.0.17'
 
 
 # -- General configuration ---------------------------------------------------
