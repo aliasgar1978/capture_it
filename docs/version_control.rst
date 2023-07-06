@@ -15,8 +15,13 @@ Version Control
      - Apr 1, 2023
      - juniper systems 'no-more' addition dynamically 
    * - 0.0.16
-     - July 29, 2023
+     - Jun 29, 2023
      - major changes, restructure project. Added debug file logging. Added visual_progress level message display.    
+   * - 0.0.17
+     - Jul 6, 2023
+     - * bug fix on output not appearing for cumulative=False parameter.
+       * added ``quick_display()`` function to get quick show output on screen
+       * added cumulative=None keyword to display output on screen
 
 
 

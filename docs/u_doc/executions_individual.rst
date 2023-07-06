@@ -70,7 +70,7 @@ Execution Steps - Explained (individual)
 			op_path,        ## output path - to store the outputs. (optional, default =".")
 
 			## optional arguments ##
-			cumulative=True,        ## True/False/Both (store output in a single file, individual command file, both)
+			cumulative=True,        ## True/False/Both/None (store output in a single file, individual command file, both, No file)
 			forced_login=False,     ## True/False (True: try to ssh/login device even if ping responce fails. )
 			parsed_output=False,    ## True/False (True: Evaluate and parse the command outputs to store device data in excel)
 			visual_progress=10,     ## display visual progress on console (default level: 3)
@@ -86,7 +86,7 @@ Execution Steps - Explained (individual)
 			* ``auth``  authentication Parameters
 			* ``devices``  dictionary of devices of list of commands to be captred for each individual device.  **Note since we are providing commands exclusively for each individual/set of device(s), Script will not auto check for device type.**
 			* ``op_path``  output path ( use "." for storing in same relative folder )
-			* ``cumulative``  (Options: True, False, 'Both') defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.
+			* ``cumulative``  (Options: True, False, 'Both', None) defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output. None=will not save text log outout to any file, but display it on screen
 			* ``forced_login``  (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
 			* ``parsed_output``  (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
 			* ``visual_progress`` (int, optional): 0 will show least progress, 10 will show all progress (default=3).
