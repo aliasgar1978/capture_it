@@ -1,6 +1,7 @@
 # -----------------------------------------------------------------------------
 import os
 from nettoolkit import Validation, STR, Multi_Execution, addressing, IPv4
+from collections import OrderedDict
 from pprint import pprint
 
 from ._exec_device import Execute_Device
@@ -140,11 +141,14 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 			Exception: raise exception if any issue with authentication or connections.
 		"""    		
 		self.devices = STR.to_set(ip_list) if isinstance(ip_list, str) else set(ip_list)
+		self.ips = []
 		self.auth = auth
 		if not isinstance(cmds, dict):
 			raise Exception("commands to be executed are to be in proper dict format")
 		self.cmds = cmds
 		self.path = path
+		self.cmd_exec_logs_all = OrderedDict()
+		self.device_type_all = OrderedDict()
 		Execute_Common.__init__(self, cumulative, forced_login, parsed_output, visual_progress, log_type, common_log_file)
 		super().__init__(self.devices)
 		self.validate_max_connection_input(concurrent_connections)
@@ -154,13 +158,13 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 
 
 
-	def execute(self, hn):
+	def execute(self, ip):
 		"""execution function for a single device. hn == ip address in this case.
 
 		Args:
-			hn (str): ip address of a reachable device
+			ip (str): ip address of a reachable device
 		"""    		
-		Execute_Device(hn, 
+		ED = Execute_Device(ip, 
 			auth=self.auth, 
 			cmds=self.cmds, 
 			path=self.path, 
@@ -170,8 +174,14 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 			visual_progress=self.visual_progress,
 			logger=self.lg,
 			)
+		#
 		if self.log_type and self.log_type.lower() in ('individual', 'both'):
 			self.lg.write_individuals(self.path)
+		#
+		self.cmd_exec_logs_all[ED.hostname] = ED.cmd_exec_logs
+		self.device_type_all[ED.hostname] =  ED.dev.dtype
+		self.ips.append(ip)
+
 
 
 
@@ -220,6 +230,10 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 			Exception: raise exception if any issue with authentication or connections.
 		"""
 		#
+		self.ips = []
+		self.cmd_exec_logs_all = OrderedDict()
+		self.device_type_all = OrderedDict()
+		self.cmds = {}
 		self.add_auth_para(auth)
 		self.verify_dev_cmd_dict(dev_cmd_dict)
 		self.add_devices(dev_cmd_dict)
@@ -317,9 +331,10 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 		Args:
 			ip (str): ip address of a reachable device
 		"""
-		Execute_Device(ip, 
+		cmds = sorted(self.dev_cmd_dict[ip])
+		ED = Execute_Device(ip, 
 			auth=self.auth, 
-			cmds=sorted(self.dev_cmd_dict[ip]), 
+			cmds=cmds, 
 			path=self.path, 
 			cumulative=self.cumulative,
 			forced_login=self.forced_login, 
@@ -329,6 +344,13 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 			)
 		if self.log_type and self.log_type.lower() in ('individual', 'both'):
 			self.lg.write_individuals(self.path)
+		#
+		self.cmd_exec_logs_all[ED.hostname] = ED.cmd_exec_logs
+		self.device_type_all[ED.hostname] =  ED.dev.dtype
+		self.ips.append(ip)
+		if not self.cmds.get(ED.dev.dtype):
+			self.cmds[ED.dev.dtype] = set()
+		self.cmds[ED.dev.dtype] = self.cmds[ED.dev.dtype].union(set(cmds))
 
 
 	def individual_device_cmds_dict(self, dev_cmd_dict):

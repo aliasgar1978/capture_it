@@ -14,13 +14,14 @@ Execution Steps - summary (individual)
 		* Dictionary of all eligible {devices : [list of commands to captures]}
 		* Output path 
 	#. execute
+	#. write/print capture log summary (optional)
 
 Execution Steps - Explained (individual)
 ----------------------------------------------
 
 	#. Import the necessary module::
 
-		from capture_it import capture_individual
+		from capture_it import capture_individual, LogSummary
 
 
 	#. Authentication Parameters::
@@ -63,7 +64,7 @@ Execution Steps - Explained (individual)
 
 	#. Start Capturing::
 
-		capture_individual(
+		c = capture_individual(
 			## mandatory arguments ##
 			auth,           ## Authentication parameters (dict)
 			devices,        ## Dictionary of devices of list of commands ( see above sample )
@@ -78,10 +79,11 @@ Execution Steps - Explained (individual)
 			common_log_file='common-debug.log',  ## provide if log_type is individual (default: None)
 			concurrent_connections=100,    ## numeric value (default:100), number of simultaneous device connections in a group. 
 		)
+		LS = LogSummary(c, print=True, write_to=f'cmds_log_summary.log')  # optional - raw commands log summary
 
 
 	.. important::
-		**Parameters**
+		**Parameters for capture_individual**
 			
 			* ``auth``  authentication Parameters
 			* ``devices``  dictionary of devices of list of commands to be captred for each individual device.  **Note since we are providing commands exclusively for each individual/set of device(s), Script will not auto check for device type.**
@@ -93,6 +95,12 @@ Execution Steps - Explained (individual)
 			* ``log_type`` (str): what type of log output requires. choices are = common, individual, both
 			* ``common_log_file`` (str): output file name of a common log file
 			* ``concurrent_connections``  (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance. 
+
+		**Parameters for LogSummary**
+			* ``c`` (capture_individual): capture_individual object instance
+			* ``print`` (bool): displays result summary on screen. Defaults to False.
+			* ``write_to`` (str): filename, writes result summary to file. Defaults to None (i.e. no file write out).
+
 
 
 	.. important::

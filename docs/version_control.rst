@@ -22,6 +22,9 @@ Version Control
      - * bug fix on output not appearing for cumulative=False parameter.
        * added ``quick_display()`` function to get quick show output on screen
        * added cumulative=None keyword to display output on screen
+   * - 0.0.18
+     - Jul 9, 2023
+     - added raw capture log summary feature
 
 
 

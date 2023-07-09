@@ -61,6 +61,7 @@ class Execute_Device():
 		self.parsed_output = parsed_output
 		self.visual_progress = visual_progress
 		self.delay_factor, self.dev = None, None
+		self.cmd_exec_logs = []
 		#
 		logger.add_host(self.log_key)
 		self.logger_list = logger.log[self.log_key]
@@ -181,6 +182,7 @@ class Execute_Device():
 					devtype=self.dev.dtype,
 					) as c:
 			if self.is_connected(c, ip):
+				self.hostname = c.hn
 				msg_level, msg = 10, f"Connection established : {ip} == {c.hn}"
 				visual_print(msg, msg_level, self.visual_progress, self.logger_list)
 
@@ -188,6 +190,12 @@ class Execute_Device():
 				self.cumulative_filename = cc.cumulative_filename
 				if self.parsed_output: 
 					xl_file = cc.write_facts()
+
+
+				# -- add command execution logs
+				self.cmd_exec_logs = cc.cmd_exec_logs
+
+
 
 	def command_capture(self, c):
 		"""start command captures on connection object
@@ -205,6 +213,6 @@ class Execute_Device():
 			visual_progress=self.visual_progress,
 			logger_list=self.logger_list,
 			cumulative=self.cumulative,
-			parsed_output=self.parsed_output
+			parsed_output=self.parsed_output,
 			)
 		return cc

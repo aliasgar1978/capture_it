@@ -20,7 +20,7 @@ Parent
 # --------------------------------------------
 # IMPORTS
 # --------------------------------------------
-from capture_it import capture_individual
+from capture_it import capture_individual, LogSummary
 from nettoolkit import *
 from pathlib import *
 from pprint import pprint
@@ -87,7 +87,7 @@ if __name__ == '__main__':
   devices_command_dict = get_devices_command_dict(dev_cmd_xl_file)
 
   # ---- START CAPTURE ----
-  capture_individual(
+  c = capture_individual(
     auth, 
     devices_command_dict,
     op_path=capture_folder, 
@@ -99,5 +99,6 @@ if __name__ == '__main__':
     common_log_file='common-debug.log',    # optional arg if log_type is individual (def: None)
     concurrent_connections=30              # optional arg (def: 100)
   )
+  LS = LogSummary(c, print=True, write_to=f'{capture_folder}/cmds_log_summary.log')
   print("Capture Task(s) Complete..")
   # ------------------------------------------------

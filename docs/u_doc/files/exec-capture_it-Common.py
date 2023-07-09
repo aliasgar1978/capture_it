@@ -2,7 +2,7 @@
 # --------------------------------------------
 # IMPORTS
 # --------------------------------------------
-from capture_it import capture
+from capture_it import capture, LogSummary
 from nettoolkit import *
 from pathlib import *
 import sys
@@ -74,7 +74,7 @@ if __name__ == '__main__':
   #    INPUT: Credentials
   # --------------------------------------------
   # option 1 ------------- ( import un/pw from a file )
-  from cred import un, pw
+  from cred import un, pw    ## cred.py should be a file from where you stored login un/pw
 
   # option 2 ------------- ( input manualy )
   # un = get_username()
@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
 
   # ---- START CAPTURE ----
-  capture(
+  c = capture(
     devices,                  # mandatory - list of devices
     auth,                     # mandatory - authentication parameters dictionary
     cmds,                     # mandatory - dictionary of list of commands
@@ -110,6 +110,7 @@ if __name__ == '__main__':
     common_log_file='common-debug.log',    # optional arg if log_type is individual (def: None)
     concurrent_connections=40              # optional arg (def: 100)
   )
+  LS = LogSummary(c, print=True, write_to=f'{capture_folder}/cmds_log_summary.log')
   print("Capture Task(s) Complete..")
   #------------------------------------------------
 

@@ -15,7 +15,7 @@ class Captures(CLP):
 	Args:
 		dtype (str): device type
 		conn (conn): connection object
-		cmds (set, list, tuple): set of commands 
+		cmds (dict, set, list, tuple): set of commands or commands dictionary 
 		path (str): path to store the captured output
 		visual_progress (int): scale 0 to 10. 0 being no output, 10 all.
 		logger(list): device logging messages list

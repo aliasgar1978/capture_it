@@ -17,3 +17,4 @@ Technical Documentation!
 	detection <t_doc/__detection>
 	exec_device <t_doc/__exec_device>
 	executions <t_doc/__executions>
+	log summary <t_doc/__cap_summary>

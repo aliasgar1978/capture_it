@@ -15,13 +15,14 @@ Execution Steps - summary (common)
 		* List of all commands to be captured (model wise)
 		* Output path
 	#. execute
+	#. write/print capture log summary (optional)
 
 Execution Steps - Explained (common)
 ----------------------------------------------
 
 	#. Import the necessary module::
 
-		from capture_it import capture
+		from capture_it import capture, LogSummary
 
 
 	#. Authentication Parameters::
@@ -41,7 +42,7 @@ Execution Steps - Explained (common)
 		devices = [
 			'192.168.1.1',
 			'10.10.10.1',
-			# ... list down all ip addresses for which output to be captured  
+			#  list down all ip addresses for which output to be captured  
 		]
 
 		# Option 2:  Store list of devices IP in a text file and get from that file.
@@ -61,13 +62,13 @@ Execution Steps - Explained (common)
 			'sh run', 
 			'sh int status', 
 			'sh lldp nei',
-			# .. edit as need  
+			# edit as need  
 		]
 		JUNIPER_JUNOS_CMDS = [
 			'show configuration | no-more',
 			'show lldp neighbors | no-more',
 			'show interfaces descriptions | no-more',
-			# .. edit as need 
+			# edit as need 
 		]
 
 		# Option 2:  Store list of commands in a text file and get from that file.
@@ -91,7 +92,7 @@ Execution Steps - Explained (common)
 
 	#. Start Capturing::
 
-		capture(
+		c = capture(
 			## mandatory arguments ##
 			devices,    ## list of device ips
 			auth,       ## Authentication parameters (dict)
@@ -107,23 +108,29 @@ Execution Steps - Explained (common)
 			common_log_file='common-debug.log',  ## provide if log_type is individual (default: None)
 			concurrent_connections=100,          ## numeric value (default:100), number of simultaneous device connections in a group. 
 		)
+		LS = LogSummary(c, print=True, write_to=f'cmds_log_summary.log')  # optional - raw commands log summary
 
 
 	.. important::
 		
-		**Parameters**
+		**Parameters for capture**
 
 		* ``devices``  list of ip addresses
 		* ``auth``  authentication Parameters
 		* ``cmds``  dictionary of list of commands to be captred (cisco, juniper, arista).
 		* ``op_path``  output path ( use "." for storing in same relative folder )
-		* ``cumulative``  (Options: True, False, 'Both', None) defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output.. None=will not save text log outout to any file, but display it on screen
+		* ``cumulative``  (Options: True, False, 'Both', None) defines how to store each command output. True=Save all output in a single file. False=Save all command output in individual file. 'Both'=will generate both kinds of output. None=will not save text log outout to any file, but display it on screen
 		* ``forced_login``  (Options: True, False) (Default: False)  Forced login to device even if device ping doesn't succeded.
 		* ``parsed_output``  (Options: True, False) (Default: False) Parse the command output and generates device database in excel file.  Each command output try to generate a pased detail tab.
 		* ``visual_progress`` (int, optional): 0 will show least progress, 10 will show all progress (default=3).
 		* ``log_type`` (str): what type of log output requires. choices are = common, individual, both
 		* ``common_log_file`` (str): output file name of a common log file
 		* ``concurrent_connections``  (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance.
+
+		**Parameters for LogSummary**
+			* ``c`` (capture_individual): capture_individual object instance
+			* ``print`` (bool): displays result summary on screen. Defaults to False.
+			* ``write_to`` (str): filename, writes result summary to file. Defaults to None (i.e. no file write out).
 
 
 	.. important::
