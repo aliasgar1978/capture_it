@@ -198,7 +198,7 @@ class LogSummary():
 		"""concatenates comands and hosts data to generate string summary 
 
 		Returns:
-			_type_: _description_
+			str: summary report in text format
 		"""		
 		fs = ''
 		for dev_type, devices in self.dev_type_hn_dict.items():
