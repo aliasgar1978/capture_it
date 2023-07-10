@@ -17,6 +17,11 @@ BANNER = '! ~~~ RAW COMMANDS CAPTURE SUMMARY (aholo2000@gmail.com) ~~~ !'
 # -----------------------------------------------------------------------------
 class LogSummary():
 	"""class generating summary report for the commands log/raw capture
+
+	Args:
+		c (conn): connection object
+		print (bool, optional): display result summary on screen. Defaults to False.
+		write_to (str, optional): filename, writes result summary to file. Defaults to None(i.e. off).
 	"""	
 
 	def __init__(self, c, print=False, write_to=None):
