@@ -14,6 +14,21 @@ from .common import visual_print, Log, write_log
 # -----------------------------------------------------------------------------------------------
 class Execute_Common():
 	"""common methods/variables declaration in a Execute Common class
+
+	Args:
+		cumulative (bool, optional): True: will store all commands output in a single file, 
+			False will store each command output in differet file. Defaults to False.
+			and 'both' will do both.
+		forced_login (bool, optional): True: will try to ssh/login to devices even if ping respince fails.
+			False will try to ssh/login only if ping responce was success. (default: False)
+		parsed_output (bool, optional): True: will check the captures and generate the general parsed excel file.
+			False will omit this step. No excel will be generated in the case. (default: False)
+		visual_progress (int, optional): 0 will not show any progress, 10 will show all progress (default=3).
+		log_type (str): what type of log output requires. choices are = common, individual, both
+		common_log_file (str): output file name of a common log file
+
+	Raises:
+		Exception: raise exception if any issue with authentication or connections.
 	"""	
 
 	def __init__(self, 
@@ -101,6 +116,27 @@ class Execute_Common():
 
 class Execute_By_Login(Multi_Execution, Execute_Common):
 	"""Execute the device capture by logging in to device.
+
+	Args:
+		ip_list (set, list, tuple): set of ip addresses to be logging for capture
+		auth (dict): authentication parameters ( un, pw, en)
+		cmds (set, list, tuple): set of commands to be captured
+		path (str): path where output(s), logs(s) should be stored.
+		cumulative (bool, optional): True: will store all commands output in a single file, 
+			False will store each command output in differet file. Defaults to False.
+			and 'both' will do both.
+		forced_login (bool, optional): True: will try to ssh/login to devices even if ping respince fails.
+			False will try to ssh/login only if ping responce was success. (default: False)
+		parsed_output (bool, optional): True: will check the captures and generate the general parsed excel file.
+			False will omit this step. No excel will be generated in the case. (default: False)
+		visual_progress (int, optional): 0 will not show any progress, 10 will show all progress (default=3).
+		log_type (str): what type of log output requires. choices are = common, individual, both
+		common_log_file (str): output file name of a common log file
+		concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
+			default is 100.
+
+	Raises:
+		Exception: raise exception if any issue with authentication or connections.
 
 	"""    	
 
@@ -192,6 +228,26 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 # -----------------------------------------------------------------------------------------------
 class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 	"""Execute the device capture by logging in to device and running individual commands on to it.
+
+	Args:
+		auth (dict): authentication parameters ( un, pw, en)
+		dev_cmd_dict: dictionary of list {device_ip:[commands list,]}
+		op_path (str): path where output(s), logs(s) should be stored.
+		cumulative (bool, optional): True: will store all commands output in a single file, 
+			False will store each command output in differet file. Defaults to False.
+			and 'both' will do both.
+		forced_login (bool, optional): True: will try to ssh/login to devices even if ping respince fails.
+			False will try to ssh/login only if ping responce was success. (default: False)
+		parsed_output (bool, optional): True: will check the captures and generate the general parsed excel file.
+			False will omit this step. No excel will be generated in the case. (default: False)
+		visual_progress (int, optional): 0 will not show any progress, 10 will show all progress (default=3).
+		log_type (str): what type of log output requires. choices are = common, individual, both
+		common_log_file (str): output file name of a common log file
+		concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
+			default is 100.
+
+	Raises:
+		Exception: raise exception if any issue with authentication or connections.
 
 	"""    	
 
