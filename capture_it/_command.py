@@ -129,7 +129,7 @@ class COMMAND():
 		banner = self.banner if self.banner else ""
 		rem = "#" if self.conn.devtype == 'juniper_junos' else "!"
 		cmd_header = f"\n{rem}{'='*80}\n{rem} output for command: {self.cmd}\n{rem}{'='*80}\n\n"
-		fname = STR.get_logfile_name(self.path, hn=self.conn.hn, cmd="", ts=self.conn.conn_time_stamp)
+		fname = STR.get_logfile_name(self.path, hn=self.conn.hn, cmd="", ts="")
 		msg_level, msg = 3, f"{self.conn.hn} : adding output to a file {fname}"
 		visual_print(msg, msg_level, self.visual_progress, self.logger_list)
 

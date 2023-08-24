@@ -25,6 +25,10 @@ Version Control
    * - 0.0.18
      - Jul 9, 2023
      - added raw capture log summary feature
+   * - 0.0.19
+     - Aug 24, 2023
+     - added `append_to` key to raw capture log summary, bug fixed on capture log.
+
 
 
 

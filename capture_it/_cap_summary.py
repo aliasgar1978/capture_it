@@ -24,13 +24,14 @@ class LogSummary():
 		write_to (str, optional): filename, writes result summary to file. Defaults to None(i.e. off).
 	"""	
 
-	def __init__(self, c, print=False, write_to=None):
+	def __init__(self, c, print=False, write_to=None, append_to=None):
 		"""class instance initializer
 
 		Args:
 			c (conn): connection object
 			print (bool, optional): display result summary on screen. Defaults to False.
 			write_to (str, optional): filename, writes result summary to file. Defaults to None(i.e. off).
+			append_to (str, optional): filename, appends result summary to given file. Defaults to None(i.e. off).
 		"""		
 		self.s = ""
 		self.cmd_exec_logs_all = c.cmd_exec_logs_all
@@ -45,7 +46,8 @@ class LogSummary():
 		self.convert_device_type_wise_hosts()
 		self.s = self.concate_cmd_host_data()
 		if print is True: self.print()
-		if write_to: self.write(write_to)
+		if write_to: self.write(write_to, wa='w')
+		if append_to: self.write(append_to, wa='a')
 
 	@property
 	def summary(self):
@@ -62,14 +64,14 @@ class LogSummary():
 		"""		
 		print(self.summary)
 
-	def write(self, file):
+	def write(self, file, wa='w'):
 		"""writes result summary to file
 
 		Args:
 			file (str): filename to write to output result summary
 		"""		
 		try:
-			with open(file, 'w') as f:
+			with open(file, wa) as f:
 				f.write(self.s)
 				print(f'Info:\tcommands capture log write to {file}.. done')
 		except:
