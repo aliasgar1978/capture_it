@@ -37,6 +37,7 @@ class Execute_Device():
 		parsed_output,
 		visual_progress,
 		logger,
+		CustomClass,
 		):
 		"""initialize execution
 
@@ -60,6 +61,7 @@ class Execute_Device():
 		self.forced_login = forced_login
 		self.parsed_output = parsed_output
 		self.visual_progress = visual_progress
+		self.CustomClass = CustomClass
 		self.delay_factor, self.dev = None, None
 		self.cmd_exec_logs = []
 		#
@@ -186,10 +188,15 @@ class Execute_Device():
 				msg_level, msg = 10, f"Connection established : {ip} == {c.hn}"
 				visual_print(msg, msg_level, self.visual_progress, self.logger_list)
 
-				cc = self.command_capture(c)
+				cc = self.command_capture(c, self.cmds)
 				self.cumulative_filename = cc.cumulative_filename
 				if self.parsed_output: 
 					xl_file = cc.write_facts()
+
+				# -- custom commands -- only log entries, no parser
+				if self.CustomClass:
+					CC = self.CustomClass(self.path+"/"+c.hn+".log", self.dev.dtype)
+					self.command_capture(c, CC.cmds)
 
 
 				# -- add command execution logs
@@ -197,7 +204,7 @@ class Execute_Device():
 
 
 
-	def command_capture(self, c):
+	def command_capture(self, c, cmds):
 		"""start command captures on connection object
 
 		Args:
@@ -208,7 +215,7 @@ class Execute_Device():
 
 		cc = Captures(dtype=self.dev.dtype, 
 			conn=c, 
-			cmds=self.cmds, 
+			cmds=cmds, 
 			path=self.path, 
 			visual_progress=self.visual_progress,
 			logger_list=self.logger_list,

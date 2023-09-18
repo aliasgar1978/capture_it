@@ -38,6 +38,7 @@ class Execute_Common():
 		visual_progress,
 		log_type,
 		common_log_file,
+		CustomClass,
 		):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
@@ -62,6 +63,7 @@ class Execute_Common():
 		self.visual_progress = visual_progress
 		self.log_type = log_type
 		self.common_log_file = common_log_file
+		self.CustomClass = CustomClass
 		#
 		self.verifications()
 		self.lg = Log()
@@ -152,6 +154,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 		log_type=None,   #  options = 'common', individual', 'both', None
 		common_log_file=None,  # provide if log_type = common
 		concurrent_connections=100,
+		CustomClass=None,
 		):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
@@ -185,7 +188,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 		self.path = path
 		self.cmd_exec_logs_all = OrderedDict()
 		self.device_type_all = OrderedDict()
-		Execute_Common.__init__(self, cumulative, forced_login, parsed_output, visual_progress, log_type, common_log_file)
+		Execute_Common.__init__(self, cumulative, forced_login, parsed_output, visual_progress, log_type, common_log_file, CustomClass)
 		super().__init__(self.devices)
 		self.validate_max_connection_input(concurrent_connections)
 		self.start()
@@ -209,6 +212,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 			parsed_output=self.parsed_output,
 			visual_progress=self.visual_progress,
 			logger=self.lg,
+			CustomClass=self.CustomClass,
 			)
 		#
 		if self.log_type and self.log_type.lower() in ('individual', 'both'):
@@ -262,6 +266,7 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 		log_type=None,         #  options = 'common', individual', 'both', None
 		common_log_file=None,  #  provide if log_type = common
 		concurrent_connections=100,
+		CustomClass=None,
 		):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
@@ -295,7 +300,7 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 		self.add_devices(dev_cmd_dict)
 		self.individual_device_cmds_dict(dev_cmd_dict)
 		self.path = op_path
-		Execute_Common.__init__(self, cumulative, forced_login, parsed_output, visual_progress, log_type, common_log_file)
+		Execute_Common.__init__(self, cumulative, forced_login, parsed_output, visual_progress, log_type, common_log_file, CustomClass)
 		super().__init__(self.devices)
 		self.validate_max_connection_input(concurrent_connections)
 		self.start()
@@ -397,6 +402,7 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 			parsed_output=self.parsed_output,
 			visual_progress=self.visual_progress,
 			logger=self.lg,
+			CustomClass=self.CustomClass,
 			)
 		if self.log_type and self.log_type.lower() in ('individual', 'both'):
 			self.lg.write_individuals(self.path)
