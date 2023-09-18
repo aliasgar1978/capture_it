@@ -26,6 +26,7 @@ class Execute_Common():
 		visual_progress (int, optional): 0 will not show any progress, 10 will show all progress (default=3).
 		log_type (str): what type of log output requires. choices are = common, individual, both
 		common_log_file (str): output file name of a common log file
+		CustomClass (class): Custom class definitition to execute additional custom commands
 
 	Raises:
 		Exception: raise exception if any issue with authentication or connections.
@@ -53,6 +54,7 @@ class Execute_Common():
 			visual_progress (int, optional): 0 will not show any progress, 10 will show all progress (default=3).
 			log_type (str): what type of log output requires. choices are = common, individual, both
 			common_log_file (str): output file name of a common log file
+			CustomClass (class): Custom class definitition to execute additional custom commands
 
 		Raises:
 			Exception: raise exception if any issue with authentication or connections.
@@ -136,6 +138,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 		common_log_file (str): output file name of a common log file
 		concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
 			default is 100.
+		CustomClass (class): Custom class definitition to execute additional custom commands
 
 	Raises:
 		Exception: raise exception if any issue with authentication or connections.
@@ -175,6 +178,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 			common_log_file (str): output file name of a common log file
 			concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
 				default is 100.
+			CustomClass (class): Custom class definitition to execute additional custom commands
 
 		Raises:
 			Exception: raise exception if any issue with authentication or connections.
@@ -249,6 +253,7 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 		common_log_file (str): output file name of a common log file
 		concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
 			default is 100.
+		CustomClass (class): Custom class definitition to execute additional custom commands
 
 	Raises:
 		Exception: raise exception if any issue with authentication or connections.
@@ -286,6 +291,7 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 			common_log_file (str): output file name of a common log file
 			concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
 				default is 100.
+			CustomClass (class): Custom class definitition to execute additional custom commands
 
 		Raises:
 			Exception: raise exception if any issue with authentication or connections.
