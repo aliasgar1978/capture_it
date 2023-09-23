@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'capture_it'
-copyright = '2022, ALIASGAR'
+copyright = '2022, ALIASGAR [ALI]'
 author = 'ALIASGAR'
 
 # The full version, including alpha/beta/rc tags

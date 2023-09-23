@@ -11,7 +11,7 @@ capture_it is an open python project to help capturing show commands output from
 Also in conjunction with facts_finder it will help generating facts database.
 Read the facts_finder package documentation for more details.
 
-*DECLARATION*
+**DECLARATION**
 
 .. caution::
 

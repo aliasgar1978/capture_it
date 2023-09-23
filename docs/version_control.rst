@@ -27,10 +27,10 @@ Version Control
      - added raw capture log summary feature
    * - 0.0.19
      - Aug 24, 2023
-     - added `append_to` key to raw capture log summary, bug fixed on capture log.
+     - added ** `append_to` ** key to raw capture log summary, bug fixed on capture log.
    * - 0.0.20
      - Sep 18, 2023
-     - added feature to execute additional custom commands.
+     - added CustomClass argument feature to capture additional **custom commands**.
 
 
 

@@ -116,6 +116,7 @@ Execution Steps - Explained (individual)
 			* ``c`` (capture_individual): capture_individual object instance
 			* ``print`` (bool): displays result summary on screen. Defaults to False.
 			* ``write_to`` (str): filename, writes result summary to file. Defaults to None (i.e. no file write out).
+			* ``append_to`` (str): filename, appends result summary to file. Defaults to None (i.e. no file write out).
 
 
 
