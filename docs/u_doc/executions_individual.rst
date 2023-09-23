@@ -122,7 +122,48 @@ Execution Steps - Explained (individual)
 
 	.. important::
 		
-			Since we are providing individual commands for each device, pay attention on device type  ``Cisco/Juniper/Arista`` and apply respective commands to the system appropriatly.
+			* Since we are providing individual commands for each device, pay attention on device type  ``Cisco/Juniper/Arista`` and apply respective commands to the system appropriatly.
+			* CustomClasss : Is usefull where an arbitrary show command output is needed based on previous show output.   
+    			* Example: show bgp summary list down all bgp neighbors. and we want to see advertised route of each neighbor.  So here *neighbor* is variable based on previous output. 
+    			* We can define a custom class which first evaluates previous_output, based on device type. gets list of neighbors. Creates a list of additinal show commands, returns it with `cmd` property.
+
+
+	#. Sample CustomClass::
+
+		def get_adv_route_string_cisco(nbr):
+			return f'show ip bgp all nei {nbr} adv'
+
+		def get_adv_route_string_juniper(nbr):
+			return f'show route advertising-protocol bgp {nbr}'
+
+
+		class CiscoBgp():
+
+			def __init__(self, conf_file, dtype):
+				self.peers = set()
+				self.show_peer_adv_route_cmds = set()
+				func_maps = {
+					'cisco_ios':{
+						'get_bgp_peers': get_bgp_peers_cisco,               # function to derive bgp peers from show output (cisco) - DIY
+						'get_adv_route_string': get_adv_route_string_cisco, # function to get string (cisco)
+					} ,
+					'juniper_junos':{
+						'get_bgp_peers': get_bgp_peers_juniper,               # function to derive bgp peers from show output (juniper) - DIY
+						'get_adv_route_string': get_adv_route_string_juniper, # function to get string (juniper)
+					} ,
+				}
+
+				self.peers = func_maps[dtype]['get_bgp_peers'](conf_file)
+				for peer in self.peers:
+					adv_routes = func_maps[dtype]['get_adv_route_string'](peer)
+					self.show_peer_adv_route_cmds.add(adv_routes)
+
+			@property
+			def cmds(self):
+				## add more as need
+				return sorted(self.show_peer_adv_route_cmds)
+
+
 
 
 
