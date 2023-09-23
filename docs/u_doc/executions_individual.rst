@@ -1,6 +1,6 @@
 
 
-Execution Steps - Separate Commands for each individual devices
+Capture - Individual Commands outputs of each devices
 ==================================================================
 
 
@@ -13,6 +13,9 @@ Execution Steps - summary (individual)
 		* Authentication parameters
 		* Dictionary of all eligible {devices : [list of commands to captures]}
 		* Output path 
+	#. [Optional]: Custom Class Input
+		* Import custom class
+		* Input class as an argument to capture function
 	#. execute
 	#. write/print capture log summary (optional)
 
@@ -62,6 +65,13 @@ Execution Steps - Explained (individual)
 		op_path = './captures/'
 
 
+	#. Import custom class ::
+
+		# A sample custom class named `CiscoBgp` imported below. 
+		# It should have a mandatory property named `cmd` to return list of additional commands to capture
+		from custom_captureit.cisco_bgp import CiscoBgp
+
+
 	#. Start Capturing::
 
 		c = capture_individual(
@@ -78,8 +88,13 @@ Execution Steps - Explained (individual)
 			log_type='individual',  ## available options = ('common', individual', 'both', None) ( default: None)
 			common_log_file='common-debug.log',  ## provide if log_type is individual (default: None)
 			concurrent_connections=100,    ## numeric value (default:100), number of simultaneous device connections in a group. 
+			CustomClass=CiscoBgp,   ## Custom Class provide if any custom command output needed based on standard command outputs (default: None)
 		)
-		LS = LogSummary(c, print=True, write_to=f'cmds_log_summary.log')  # optional - raw commands log summary
+		LS = LogSummary(c,                     ## pass here capture instance `c`
+			print=True,                        ## use to display on screen. (default: False)
+			write_to=f'cmds_log_summary.log',  ## use if create a fresh log summary (default: None)
+			append_to=f'cmds_log_summary.log', ## use if append to an existing log summary (default: None)
+		)
 
 
 	.. important::
@@ -95,6 +110,7 @@ Execution Steps - Explained (individual)
 			* ``log_type`` (str): what type of log output requires. choices are = common, individual, both
 			* ``common_log_file`` (str): output file name of a common log file
 			* ``concurrent_connections``  (numeric) (Default: 100), change the number of simultaneous device connections as per link connection and your pc cpu processng performance. 
+			* ``CustomClass`` (Class) (Default:None), provide custom class, containing a mandatory property `cmd` to return list of additional show commands.
 
 		**Parameters for LogSummary**
 			* ``c`` (capture_individual): capture_individual object instance

@@ -7,6 +7,6 @@ User documentation!
    :caption: Contents:
 
 
-   Execution-Common <u_doc/executions_legacy>
-   Execution-Individual <u_doc/executions_individual>
-   Execution-Quick Show <u_doc/quick_display>
+   Capture-All <u_doc/executions_legacy>
+   Capture-Individual <u_doc/executions_individual>
+   Quick Show <u_doc/quick_display>
