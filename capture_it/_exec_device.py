@@ -2,7 +2,7 @@
 # Imports
 # -----------------------------------------------------------------------------
 from time import sleep
-from nettoolkit import STR, IP
+from nettoolkit_common import STR, IP
 from .common import visual_print
 from ._detection import DeviceType
 from ._conn import conn

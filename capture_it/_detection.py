@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 import paramiko
 from time import sleep
-from nettoolkit import STR
+from nettoolkit_common import STR
 from .common import visual_print
 
 

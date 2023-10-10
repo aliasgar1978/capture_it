@@ -1,8 +1,6 @@
 # -----------------------------------------------------------------------------
-import os
-from nettoolkit import Validation, STR, Multi_Execution, addressing, IPv4
+from nettoolkit_common import Validation, STR, Multi_Execution, addressing, IPv4
 from collections import OrderedDict
-from pprint import pprint
 
 from ._exec_device import Execute_Device
 from .common import visual_print, Log, write_log

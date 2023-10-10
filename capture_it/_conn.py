@@ -3,7 +3,7 @@
 # -----------------------------------------------------------------------------
 from netmiko import ConnectHandler
 import traceback
-from nettoolkit import STR, LOG
+from nettoolkit_common import STR, LOG
 from .common import visual_print
 from ._detection import DeviceType
 

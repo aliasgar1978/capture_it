@@ -2,7 +2,7 @@
 # Imports
 # -----------------------------------------------------------------------------
 import pandas as pd
-from nettoolkit import append_to_xl
+from nettoolkit_db import append_to_xl
 from .common import juniper_add_no_more, visual_print
 from ._clp import CLP
 

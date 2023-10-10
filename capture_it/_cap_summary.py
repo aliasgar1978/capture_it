@@ -3,9 +3,7 @@
 # IMPORTS
 # --------------------------------------------
 
-import pandas as pd
 from collections import OrderedDict
-from pprint import pprint
 
 # -----------------------------------------------------------------------------
 # STATIC VAR

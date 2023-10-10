@@ -1,6 +1,6 @@
-__doc__ = '''Facts Capture'''
+__doc__ = '''Device Output Capture Utility'''
 
-__version__ = "0.0.20"
+__version__ = "0.1.0"
 
 from .executions import Execute_By_Login as capture
 from .executions import Execute_By_Individual_Commands as capture_individual
