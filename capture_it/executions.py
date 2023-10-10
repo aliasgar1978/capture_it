@@ -1,5 +1,6 @@
 # -----------------------------------------------------------------------------
 from nettoolkit_common import Validation, STR, Multi_Execution, addressing, IPv4
+import facts_finder as ff
 from collections import OrderedDict
 
 from ._exec_device import Execute_Device
@@ -112,6 +113,30 @@ class Execute_Common():
 			return False
 		return True
 
+	def ff_sequence(self, ED, CustomDeviceFactsClass, foreign_keys):
+		# --- FF Sequences ---
+		cleaned_fact = ff.CleanFacts(
+			capture_log_file=ED.cumulative_filename, 
+			capture_parsed_file=ED.xl_file,
+			convert_to_cit=False,
+			skip_txtfsm=True,
+			new_suffix='-clean',
+			use_cdp=False,
+		)
+		cleaned_fact()
+		print(f"Cleaning done...,", end='\t')
+		#
+		if CustomDeviceFactsClass:
+			ADF = CustomDeviceFactsClass(cleaned_fact)
+			ADF()
+			ADF.write()
+			print(f"Custom Data Modifications done...,", end='\t')
+		#
+		ff.rearrange_tables(cleaned_fact.clean_file, foreign_keys=foreign_keys)
+		print(f"Column Rearranged done..., ", end='\t')
+		print(f"All Tasks Completed !! {ED.hostname} !!\n{'-'*80}")
+
+
 # -----------------------------------------------------------------------------------------------
 # Execute class - capture_it - for common commands to all devices
 # -----------------------------------------------------------------------------------------------
@@ -156,6 +181,8 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 		common_log_file=None,  # provide if log_type = common
 		concurrent_connections=100,
 		CustomClass=None,
+		CustomDeviceFactsClass=None,
+		foreign_keys={},
 		):
 		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
 
@@ -188,6 +215,8 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 			raise Exception("commands to be executed are to be in proper dict format")
 		self.cmds = cmds
 		self.path = path
+		self.CustomDeviceFactsClass = CustomDeviceFactsClass
+		self.foreign_keys = foreign_keys
 		self.cmd_exec_logs_all = OrderedDict()
 		self.device_type_all = OrderedDict()
 		Execute_Common.__init__(self, cumulative, forced_login, parsed_output, visual_progress, log_type, common_log_file, CustomClass)
@@ -219,13 +248,11 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 		#
 		if self.log_type and self.log_type.lower() in ('individual', 'both'):
 			self.lg.write_individuals(self.path)
-		#
 		self.cmd_exec_logs_all[ED.hostname] = ED.cmd_exec_logs
 		self.device_type_all[ED.hostname] =  ED.dev.dtype
 		self.ips.append(ip)
-
-
-
+		#
+		self.ff_sequence(ED, self.CustomDeviceFactsClass, self.foreign_keys)
 
 
 

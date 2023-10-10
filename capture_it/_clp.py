@@ -98,6 +98,7 @@ class CLP():
 			cmdObj.banner = banner		
 			cmdObj.op_to_file(cumulative=cumulative)
 			self.cmd_exec_logs[-1]['raw'] = True
+			if self.cmd_exec_logs[-1]['raw']: self.cumulative_filename = cmdObj.cumulative_filename
 			return cmdObj
 		except:
 			msg_level, msg = 2, (f"{self.hn} : Error writing output for command {cmd}\n",

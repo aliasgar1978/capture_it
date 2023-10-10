@@ -3,6 +3,7 @@
 # -----------------------------------------------------------------------------
 from time import sleep
 from nettoolkit_common import STR, IP
+import facts_finder as ff
 from .common import visual_print
 from ._detection import DeviceType
 from ._conn import conn
@@ -189,15 +190,17 @@ class Execute_Device():
 				visual_print(msg, msg_level, self.visual_progress, self.logger_list)
 
 				cc = self.command_capture(c, self.cmds)
-				self.cumulative_filename = cc.cumulative_filename
+				if not self.cumulative_filename: self.cumulative_filename = cc.cumulative_filename 
 				if self.parsed_output: 
-					xl_file = cc.write_facts()
+					self.xl_file = cc.write_facts()
 
 				# -- custom commands -- only log entries, no parser
 				if self.CustomClass:
 					CC = self.CustomClass(self.path+"/"+c.hn+".log", self.dev.dtype)
 					self.command_capture(c, CC.cmds)
 
+				if True: # (condition TBD - facts-finder executions)
+					self.check_facts_finder_requirements(c)
 
 				# -- add command execution logs
 				self.cmd_exec_logs = cc.cmd_exec_logs
@@ -223,3 +226,29 @@ class Execute_Device():
 			parsed_output=self.parsed_output,
 			)
 		return cc
+
+
+
+	def missed_commands_capture(self, c, missed_cmds): 
+		msg_level, msg = 7, f"Retrying missed_cmds: {missed_cmds}"
+		visual_print(msg, msg_level, self.visual_progress, self.logger_list)
+		self.command_capture(c, missed_cmds)
+
+	def is_any_ff_cmds_missed(self, c):
+		necessary_cmds = ff.get_necessary_cmds(self.dev.dtype)
+		with open(self.path+"/"+c.hn+".log", 'r') as f:
+			log_lines = f.readlines()
+		captured_cmds = set()
+		for log_line in log_lines:
+			if log_line[1:].startswith(" output for command: "):
+				captured_cmd = ff.get_absolute_command(self.dev.dtype, log_line.split(" output for command: ")[-1])
+				captured_cmds.add(captured_cmd)
+		missed_cmds = necessary_cmds.difference(captured_cmds)
+		return missed_cmds
+
+	def check_facts_finder_requirements(self, c):
+		missed_cmds = self.is_any_ff_cmds_missed(c)
+		for x in range(3):   # 3-Retries
+			if not missed_cmds: return None
+			self.missed_commands_capture(c, missed_cmds)
+			missed_cmds = self.is_any_ff_cmds_missed(c)
