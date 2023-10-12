@@ -3,7 +3,12 @@
 # -----------------------------------------------------------------------------
 from netmiko import ConnectHandler
 import traceback
-from nettoolkit_common import STR, LOG
+try:
+	from nettoolkit_common import STR, LOG
+except:
+	# backword compatible
+	from nettoolkit import STR, LOG
+
 from .common import visual_print
 from ._detection import DeviceType
 

@@ -4,7 +4,12 @@
 # -----------------------------------------------------------------------------
 import paramiko
 from time import sleep
-from nettoolkit_common import STR
+try:
+	from nettoolkit_common import STR
+except:
+	# backword compatible
+	from nettoolkit import STR
+
 from .common import visual_print
 
 

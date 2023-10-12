@@ -2,7 +2,12 @@
 # Imports
 # -----------------------------------------------------------------------------
 from time import sleep
-from nettoolkit_common import STR, IP
+try:
+	from nettoolkit_common import STR, IP
+except:
+	# backword compatible
+	from nettoolkit import STR, IP
+
 import facts_finder as ff
 from .common import visual_print
 from ._detection import DeviceType
@@ -26,6 +31,8 @@ class Execute_Device():
 		parsed_output (bool): parse output and generate Excel or not.
 		visual_progress (int): scale 0 to 10. 0 being no output, 10 all.
 		logger(list): device logging messages list
+		CustomClass(class): Custom class definition to provide additinal custom variable commands
+		fg(bool): facts generation
 	"""    	
 
 	def __init__(self, 
@@ -39,19 +46,9 @@ class Execute_Device():
 		visual_progress,
 		logger,
 		CustomClass,
+		fg,
 		):
 		"""initialize execution
-
-		Args:
-			ip (str): device ip
-			auth (dict): authentication parameters
-			cmds (list, set, tuple): set of commands to be executed.
-			path (str): path where output to be stored
-			cumulative (bool): True,False,'both'.
-			forced_login (bool): True will try login even if device ping fails.
-			parsed_output (bool): parse output and generate Excel or not.
-			visual_progress (int): scale 0 to 10. 0 being no output, 10 all.
-			logger(list): device logging messages list
 		"""    		
 		self.log_key = ip
 		self.auth = auth
@@ -63,6 +60,7 @@ class Execute_Device():
 		self.parsed_output = parsed_output
 		self.visual_progress = visual_progress
 		self.CustomClass = CustomClass
+		self.fg = fg
 		self.delay_factor, self.dev = None, None
 		self.cmd_exec_logs = []
 		#
@@ -199,8 +197,10 @@ class Execute_Device():
 					CC = self.CustomClass(self.path+"/"+c.hn+".log", self.dev.dtype)
 					self.command_capture(c, CC.cmds)
 
-				if True: # (condition TBD - facts-finder executions)
-					self.check_facts_finder_requirements(c)
+				# -- if facts generation - check mandary commands present, otherwise capture those --
+				if self.fg:
+					missed_cmds = self.check_facts_finder_requirements(c)
+					self.retry_missed_cmds(c, missed_cmds)
 
 				# -- add command execution logs
 				self.cmd_exec_logs = cc.cmd_exec_logs
@@ -229,8 +229,8 @@ class Execute_Device():
 
 
 
-	def missed_commands_capture(self, c, missed_cmds): 
-		msg_level, msg = 7, f"Retrying missed_cmds: {missed_cmds}"
+	def missed_commands_capture(self, c, missed_cmds, x): 
+		msg_level, msg = 7, f"{c.hn} - Retrying missed_cmds({x+1}): {missed_cmds}"
 		visual_print(msg, msg_level, self.visual_progress, self.logger_list)
 		self.command_capture(c, missed_cmds)
 
@@ -247,8 +247,13 @@ class Execute_Device():
 		return missed_cmds
 
 	def check_facts_finder_requirements(self, c):
-		missed_cmds = self.is_any_ff_cmds_missed(c)
-		for x in range(3):   # 3-Retries
+		return self.is_any_ff_cmds_missed(c)
+
+	def retry_missed_cmds(self,c, missed_cmds):
+		for x in range(3):   # 3-tries
 			if not missed_cmds: return None
-			self.missed_commands_capture(c, missed_cmds)
+			self.missed_commands_capture(c, missed_cmds, x)
 			missed_cmds = self.is_any_ff_cmds_missed(c)
+		if missed_cmds:	
+			msg_level, msg = 3, f"{c.hn} - Error capture all mandatory commands, try do manually.."
+			visual_print(msg, msg_level, self.visual_progress, self.logger_list)

@@ -2,7 +2,12 @@
 # Imports
 # -----------------------------------------------------------------------------
 import pandas as pd
-from nettoolkit_db import append_to_xl
+try:
+	from nettoolkit_db import append_to_xl
+except:
+	# backword compatible
+	from nettoolkit import append_to_xl
+	
 from .common import juniper_add_no_more, visual_print
 from ._clp import CLP
 

@@ -1,7 +1,12 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
-from nettoolkit_common import STR, IO
+try:
+	from nettoolkit_common import STR, IO
+except:
+	# backword compatible
+	from nettoolkit import STR, IO
+
 from .common import visual_print
 
 # -----------------------------------------------------------------------------
