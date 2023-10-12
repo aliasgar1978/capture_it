@@ -62,6 +62,8 @@ class Execute_Common():
 		self.auth = auth
 
 	def set_defaults(self):
+		"""setting the default value for optional user input parameters
+		"""		
 		self.cumulative = True
 		self.forced_login = True
 		self.parsed_output = False
@@ -91,7 +93,7 @@ class Execute_Common():
 			visual_print(msg, msg_level, self.visual_progress)
 
 
-	## getters/setters ##
+	## getters/setters - Optional ##
 
 	@property
 	def cumulative(self):
@@ -167,6 +169,27 @@ class Execute_Common():
 	## variable user inputs ##
 
 	def dependent_cmds(self, custom_dynamic_cmd_class):
+		"""Provide dependent commands via a class definition.  A new variable set of commands can be passed
+		here using defined custom_dynamic_cmd_class class.  Defined class must have an abstract property called `cmds`. 
+		which should return a new set/list of commands to be executed.  A good example of usage of it is - 
+		derive the bgp neighbor ip addresses from show ip bgp summary output, and then create new set of commands to see
+		advertised route for those neighbor ip addresses.  In this way no need to create a separate set of show commands for multiple
+		devices, custom class will take care of generating additional show commands to see advertized routes based on neighbors 
+		appear on bgp summary output. ( ofcouse, show ip bgp summary should be there in original show capture ) 		
+
+		Args:
+			custom_dynamic_cmd_class (_type_): _description_
+
+		Raises:
+			Exception: invalid input `custom_dynamic_cmd_class` for wront types
+			Exception: mandatory property missing `cmds` for missing property in provided class
+		"""		
+		if not hasattr(custom_dynamic_cmd_class, '__class__'):
+			raise Exception(f"invalid input `custom_dynamic_cmd_class`,  expected `class`, got `{type(custom_dynamic_cmd_class)}`")
+		try:
+			custom_dynamic_cmd_class.cmds
+		except AttributeError:
+			raise Exception(f"mandatory property missing `cmds` in provided class, please implement.")
 		self.CustomClass = custom_dynamic_cmd_class
 
 
@@ -188,12 +211,20 @@ class Execute_Common():
 			msg_level, msg = 0, f'Device Connection: {ip} :: Skipped due to bad Input'
 			visual_print(msg, msg_level, self.visual_progress)
 			return False
-		return True
 
 
 	## generate Facts usings Facts-Finder ##
 
 	def generate_facts(self, CustomDeviceFactsClass=None, foreign_keys={}):
+		"""generate excel facts -clean.xlsx file using facts finder
+
+		Args:
+			CustomDeviceFactsClass (class, optional): class definition for the modification of excel facts with custom properties. Defaults to None.
+			foreign_keys (dict, optional): custom keys(aka: custom columns) here in order to accept them and display in appropriate order. Defaults to {}.
+
+		Raises:
+			Exception: Invalid type: foreign_keys if recieved in format other than dict.
+		"""		
 		self.fg = True
 		self.CustomDeviceFactsClass = CustomDeviceFactsClass
 		if isinstance(foreign_keys, dict):
@@ -203,7 +234,14 @@ class Execute_Common():
 
 
 	def ff_sequence(self, ED, CustomDeviceFactsClass, foreign_keys):
-		# --- FF Sequences ---
+		"""facts finder execution sequences
+
+		Args:
+			ED (Execute_Device): Execute_Device class instance post capture finishes
+			CustomDeviceFactsClass (class): class definition for the modification of excel facts with custom properties.
+			foreign_keys (_type_): custom keys(aka: custom columns) 
+		"""	
+		# -- cleate an instance --
 		cleaned_fact = ff.CleanFacts(
 			capture_log_file=ED.cumulative_filename, 
 			capture_parsed_file=None,
@@ -213,16 +251,16 @@ class Execute_Common():
 			use_cdp=False,
 		)
 		print(f"{ED.cumulative_filename.split('/')[-1][:-4]} -", end='\t')
-		#
+		# -- execute it --
 		cleaned_fact()
 		print(f"Cleaning done...,", end='\t')
-		#
+		# -- custom facts additions --
 		if CustomDeviceFactsClass:
 			ADF = CustomDeviceFactsClass(cleaned_fact)
 			ADF()
 			ADF.write()
 			print(f"Custom Data Modifications done...,", end='\t')
-		#
+		# -- rearranging tables columns --
 		ff.rearrange_tables(cleaned_fact.clean_file, foreign_keys=foreign_keys)
 		print(f"Column Rearranged done..., ", end='\t')
 		print(f"Facts-Generation Tasks Completed !! {ED.hostname} !!\n{'-'*80}")
@@ -262,7 +300,8 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 	"""    	
 
 	def __init__(self, ip_list, auth, cmds, path="."):
-		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
+		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, 
+		and execute given commands.
 		"""    		
 		Execute_Common.__init__(self, auth)
 		self.devices = STR.to_set(ip_list) if isinstance(ip_list, str) else set(ip_list)
@@ -285,6 +324,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 		Args:
 			ip (str): ip address of a reachable device
 		"""    		
+		# - capture instance -
 		ED = Execute_Device(ip, 
 			auth=self.auth, 
 			cmds=self.cmds, 
@@ -297,13 +337,13 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 			CustomClass=self.CustomClass,
 			fg=self.fg,
 			)
-		#
+		# - capture logs -
 		if self.log_type and self.log_type.lower() in ('individual', 'both'):
 			self.lg.write_individuals(self.path)
 		self.cmd_exec_logs_all[ED.hostname] = ED.cmd_exec_logs
 		self.device_type_all[ED.hostname] =  ED.dev.dtype
 		self.ips.append(ip)
-		#
+		# - facts generations -
 		if self.fg: self.ff_sequence(ED, self.CustomDeviceFactsClass, self.foreign_keys)
 
 
@@ -340,7 +380,8 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 	"""    	
 
 	def __init__(self, auth, dev_cmd_dict, path='.'):
-		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, and execute given commands.
+		"""Initiatlize the connections for the provided iplist, authenticate with provided auth parameters, 
+		and execute given commands.
 		"""
 		#
 		Execute_Common.__init__(self, auth)
@@ -441,6 +482,7 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 			ip (str): ip address of a reachable device
 		"""
 		cmds = sorted(self.dev_cmd_dict[ip])
+		# - capture instance -
 		ED = Execute_Device(ip, 
 			auth=self.auth, 
 			cmds=cmds, 
@@ -453,9 +495,9 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 			CustomClass=self.CustomClass,
 			fg=self.fg,
 			)
+		# - log capture -
 		if self.log_type and self.log_type.lower() in ('individual', 'both'):
 			self.lg.write_individuals(self.path)
-		#
 		self.cmd_exec_logs_all[ED.hostname] = ED.cmd_exec_logs
 		self.device_type_all[ED.hostname] =  ED.dev.dtype
 		self.ips.append(ip)
@@ -463,7 +505,7 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 		if not self.cmds.get(ED.dev.dtype):
 			self.cmds[ED.dev.dtype] = set()
 		self.cmds[ED.dev.dtype] = self.cmds[ED.dev.dtype].union(set(cmds))
-		#
+		# - facts generation -
 		if self.fg: self.ff_sequence(ED, self.CustomDeviceFactsClass, self.foreign_keys)
 
 
