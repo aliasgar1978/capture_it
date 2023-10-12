@@ -229,12 +229,27 @@ class Execute_Device():
 
 
 
-	def missed_commands_capture(self, c, missed_cmds, x): 
+	def missed_commands_capture(self, c, missed_cmds, x=""): 
+		"""recaptures missed commands
+
+		Args:
+			c (conn): connection object
+			missed_cmds (set): list/set of commands for which output to be recapture
+			x (int, optional): iteration value
+		"""		
 		msg_level, msg = 7, f"{c.hn} - Retrying missed_cmds({x+1}): {missed_cmds}"
 		visual_print(msg, msg_level, self.visual_progress, self.logger_list)
 		self.command_capture(c, missed_cmds)
 
 	def is_any_ff_cmds_missed(self, c):
+		"""checks and returns missed mandatory capture commands
+
+		Args:
+			c (conn): connection object
+
+		Returns:
+			set: missed mandatory commands
+		"""		
 		necessary_cmds = ff.get_necessary_cmds(self.dev.dtype)
 		with open(self.path+"/"+c.hn+".log", 'r') as f:
 			log_lines = f.readlines()
@@ -247,9 +262,27 @@ class Execute_Device():
 		return missed_cmds
 
 	def check_facts_finder_requirements(self, c):
+		"""checks and returns missed mandatory capture commands
+		clone to is_any_ff_cmds_missed
+
+		Args:
+			c (conn): connection object
+
+		Returns:
+			set: missed mandatory commands
+		"""		
 		return self.is_any_ff_cmds_missed(c)
 
 	def retry_missed_cmds(self,c, missed_cmds):
+		"""retry missed commands captures
+
+		Args:
+			c (conn): connection object instance
+			missed_cmds (set): missed commands
+
+		Returns:
+			None: No retuns
+		"""		
 		for x in range(3):   # 3-tries
 			if not missed_cmds: return None
 			self.missed_commands_capture(c, missed_cmds, x)
