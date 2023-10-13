@@ -1,3 +1,7 @@
+"""
+Not in use
+"""
+
 
 import PySimpleGUI as sg
 from nettoolkit.forms.formitems import *
@@ -71,23 +75,3 @@ def exec_common_cmds_frame():
 		under_line(80),
 
 		])
-
-
-  # c = capture(
-  #   devices,                  # mandatory - list of devices
-  #   auth,                     # mandatory - authentication parameters dictionary
-  #   cmds,                     # mandatory - dictionary of list of commands
-  #   path=capture_folder,      # mandatory - output capture path
-  #   cumulative=True,                # optional arg ( options = True, False, 'both', None)
-  #   forced_login=True,              # optional arg 
-  #   parsed_output=True,             # optional arg (def: False)
-  #   # visual_progress=0,                    # optional arg (def: 3)
-  #   # log_type='individual',                       # optional arg - options = 'common', individual', 'both', None ( def: None)
-  #   # common_log_file='common-debug.log',  # optional arg if log_type is individual (def: None)
-  #   # concurrent_connections=50            # optional arg (def: 100)
-  # )
-  # LogSummary(c, 
-  #   # print=True, 
-  #   # write_to=f'{capture_folder}/cmds_log_summary.log', 
-  #   append_to=f'{capture_folder}/cmds_log_summary.log', 
-  #   )

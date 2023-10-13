@@ -4,9 +4,9 @@ from nettoolkit.forms.formitems import *
 from capture_it import capture, quick_display, LogSummary
 
 
-def cit_common_exec(i):
+def cit_common_exec(obj, i):
 	devices = i['device_ips']
-	devices = [d.split() for d in devices]
+	devices = [d.strip() for d in devices.split("\n")]
 	auth = {'un': i['cred_un'] ,'pw': i['cred_pw'], 'en': i['cred_en']}
 	cmds = {
 		'cisco_ios': i['cisco_cmds'].split("\n"),
@@ -23,27 +23,47 @@ def cit_common_exec(i):
 	parsed_output = i['parsed_output']
 	visual_progress = i['visual_progress']
 	concurrent_connections = i['concurrent_connections'] if i['concurrent_connections'].isnumeric() else 100
+	common_log_file = i['common_log_file']
+	log_type = i['cred_log_type']
 	log_print = i['print']
 	append_to = f"{path}/{i['append_to']}"
+	fg = i['generate_facts']
 
-
+	# # ---- START CAPTURE ----
 	c = capture(
-		devices,
-		auth,
-		cmds,
-		path=path,
-		cumulative=cumulative, 
-		forced_login=forced_login,
-		parsed_output=parsed_output,
-		visual_progress=visual_progress,
-		concurrent_connections=concurrent_connections,
-		# CustomClass=CiscoBgp,
+		ip_list=devices,
+		auth=auth,    
+		cmds=cmds,    
+		path=path,    
 	)
-	LogSummary(c, 
-		print=log_print, 
-		append_to=append_to, 
-	)
-	print("Capture Task(s) Complete..")
+	# # ----- Key settings -----
+	c.cumulative = cumulative
+	c.forced_login = forced_login
+	c.parsed_output = parsed_output
+	if visual_progress: c.visual_progress = visual_progress
+	if concurrent_connections: c.concurrent_connections = concurrent_connections
+	if obj.custom_dynamic_cmd_class: c.custom_dynamic_cmd_class = obj.custom_dynamic_cmd_class
+	if log_type: c.log_type = log_type
+	if common_log_file and log_type=='common': c.common_log_file = common_log_file
+
+	# # ----- facts generations -----
+	if fg:
+		c.generate_facts(
+			CustomDeviceFactsClass=obj.custom_ff_class,
+			foreign_keys=obj.custom_fk,
+		)
+
+	# # ----- execution -----
+	c()
+
+	# # ----- Execution Log Summary -----
+	ls_dict = {}
+	if append_to: ls_dict['append_to'] = append_to
+	if log_print: ls_dict['print'] = log_print
+	LogSummary(c, **ls_dict)
+
+	# # ----- Finish -----
+	sg.Popup("Capture Task(s) Complete..")
 
 
 

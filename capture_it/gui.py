@@ -1,14 +1,10 @@
 
 import PySimpleGUI as sg
 
-# from nettoolkit import *
-# from nettoolkit.forms import *
 from capture_it.forms.cred import *
 from capture_it.forms.options import *
 from capture_it.forms.common_to_all import *
-# from capture_it.forms.exec_common import *
-# from capture_it.forms.exec_individual import exec_individual_cmds_frame
-# from capture_it.forms.exec_quick_show import exec_quick_show_cmds_frame
+from capture_it.forms.custom import *
 
 # -----------------------------------------------------------------------------
 # Class to initiate UserForm
@@ -24,6 +20,7 @@ class CaptureIT():
 		self.tabs_dic = {
 			'cred': exec_cred_frame(),
 			'options': exec_options_frame(),
+			'custom': exec_custom_frame(),
 			'Common': exec_common_to_all_frame(),
 			# 'Individual': exec_individual_cmds_frame(),
 			# 'Quick Show': exec_quick_show_cmds_frame(),
@@ -34,16 +31,35 @@ class CaptureIT():
 			'cisco_cmd_list_file': cisco_cmd_list_file_exec,
 			'juniper_cmd_list_file': juniper_cmd_list_file_exec,
 			'cit_common': cit_common_exec,
+			'custom_cit_file': custom_cit_file_exec,
+			'custom_dynamic_cmd_class_name': custom_dynamic_cmd_class_name_exec,
+			'generate_facts': generate_facts_exec,
+			'custom_ff_file': custom_ff_file_exec,
+			'custom_fk_file': custom_fk_file_exec,
+			'custom_ff_class_name': custom_ff_name_exec,
+			'custom_fk_name': custom_fk_name_exec,
+
 		}
 
 		self.event_updaters = {
 			# 'cred_pw',
+			'cit_common',
 			'device_ip_list_file',
 			'cisco_cmd_list_file',
 			'juniper_cmd_list_file',
+			'custom_cit_file',
+			'custom_dynamic_cmd_class_name',
+			'generate_facts',
+			'custom_ff_file', 'custom_ff_class_name',
+			'custom_fk_file', 'custom_fk_name',
 		}
 
+		# dynamic variables
+		self.custom_dynamic_cmd_class = None   # custom dynamic commands execution class
+		self.custom_ff_class = None  # custom facts finder class
+		self.custom_fk = {}  # custom facts finder foreign keys
 		self.create_form()
+
 
 
 	def create_form(self):
@@ -102,6 +118,13 @@ class CaptureIT():
 	def clear_fields(self):
 		fields = (
 			'op_folder', 'cred_en', 'cred_un', 'cred_pw', 
+			'device_ip_list_file', 'device_ips',
+			'cisco_cmd_list_file', 'cisco_cmds',
+			'juniper_cmd_list_file', 'juniper_cmds',
+			'custom_cit_file', 'custom_dynamic_cmd_class_name', 'custom_dynamic_cmd_class_str',
+			'custom_ff_file', 'custom_ff_class_name', 'custom_ff_class_str',
+			'custom_fk_file', 'custom_fk_name','custom_fk_str',
+			'append_to', 'common_log_file', 'cred_log_type', 'concurrent_connections', 'visual_progress',
 
 		)
 		for field in fields:
@@ -119,8 +142,9 @@ class CaptureIT():
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
 	pass
-	# Test UI #
-	u = CaptureIT()
-	# pprint(u.dic)
-	del(u)
+	# # Test UI #
+	# u = CaptureIT()
+	# from pprint import pprint
+	# # pprint(u.custom_dynamic_cmd_class)
+	# del(u)
 # ------------------------------------------------------------------------------
