@@ -29,7 +29,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
-    install_requires= ['nettoolkit>0.1.0', 'paramiko', 'netmiko', 'pandas', 'ntc-templates'],
+    install_requires= ['nettoolkit>0.1.0', 'nettoolkit_common', 'nettoolkit_db', 'paramiko', 'netmiko', 'pandas', 'ntc-templates'],
     # extras_require={'docs': docs_extras},
 )
 
