@@ -1,4 +1,4 @@
-nettoolkit>=0.1.0
+nettoolkit>=0.1.1
 nettoolkit_common
 nettoolkit_db
 paramiko>=2.7.0

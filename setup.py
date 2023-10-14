@@ -15,7 +15,7 @@ docs_extras = [
 
 setuptools.setup(
     name="capture_it",
-    version="0.1.0",
+    version="0.1.1",
     author="ALIASGAR - ALI",
     author_email="aholo2000@gmail.com",
     description="Networking Device show output|Config capture and parsing utility",
@@ -29,7 +29,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
-    install_requires= ['nettoolkit>0.1.0', 'nettoolkit_common', 'nettoolkit_db', 'paramiko', 'netmiko', 'pandas', 'ntc-templates'],
+    install_requires= ['nettoolkit>0.1.1', 'nettoolkit_common', 'nettoolkit_db', 'paramiko', 'netmiko', 'pandas', 'ntc-templates'],
     # extras_require={'docs': docs_extras},
 )
 
