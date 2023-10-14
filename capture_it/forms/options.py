@@ -10,7 +10,7 @@ def exec_options_frame():
 		sg.Frame: Frame with filter selection components
 	"""    		
 	cumulative=('cumulative', 'non-cumulative', 'both')
-	log_type = (None, 'common', 'individual', 'both')
+	log_type = (None, 'common', 'individual')
 	return sg.Frame(title=None, 
 					relief=sg.RELIEF_SUNKEN, 
 					layout=[

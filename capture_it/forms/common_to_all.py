@@ -12,7 +12,7 @@ def cit_common_exec(obj, i):
 		'cisco_ios': i['cisco_cmds'].split("\n"),
 		'juniper_junos': i['juniper_cmds'].split("\n"),
 	}
-	path = i['op_folder']
+	path = i['cit_op_folder']
 	if i['cred_cumulative'] == 'cumulative':
 		cumulative = True
 	elif i['cred_cumulative'] == 'non-cumulative':
@@ -22,12 +22,24 @@ def cit_common_exec(obj, i):
 	forced_login = i['forced_login']
 	parsed_output = i['parsed_output']
 	visual_progress = i['visual_progress']
-	concurrent_connections = i['concurrent_connections'] if i['concurrent_connections'].isnumeric() else 100
+	concurrent_connections = int(i['concurrent_connections']) if i['concurrent_connections'].isnumeric() else 100
 	common_log_file = i['common_log_file']
-	log_type = i['cred_log_type']
+	log_type = i['cred_log_type'] if i['cred_log_type'] else None
 	log_print = i['print']
 	append_to = f"{path}/{i['append_to']}"
 	fg = i['generate_facts']
+
+	# # # ---- PARA PRINT ----
+	# paras = (devices, auth, cmds, path, cumulative, forced_login, parsed_output, visual_progress, concurrent_connections, common_log_file,
+	# 	log_type, log_print, append_to, fg)
+	# for para in paras:
+	# 	print(para)
+	# print('path', path)
+	# print('common_log_file', common_log_file)
+	# print('log_type', log_type)
+	# print('log_print', log_print)
+	# print('append_to', append_to)
+	# return None
 
 	# # ---- START CAPTURE ----
 	c = capture(
@@ -42,9 +54,12 @@ def cit_common_exec(obj, i):
 	c.parsed_output = parsed_output
 	if visual_progress: c.visual_progress = visual_progress
 	if concurrent_connections: c.concurrent_connections = concurrent_connections
-	if obj.custom_dynamic_cmd_class: c.custom_dynamic_cmd_class = obj.custom_dynamic_cmd_class
 	if log_type: c.log_type = log_type
 	if common_log_file and log_type=='common': c.common_log_file = common_log_file
+
+	# # ----- Dynamic commands -----
+	if obj.custom_dynamic_cmd_class: 
+		c.dependent_cmds(custom_dynamic_cmd_class=obj.custom_dynamic_cmd_class)
 
 	# # ----- facts generations -----
 	if fg:
@@ -64,7 +79,7 @@ def cit_common_exec(obj, i):
 
 	# # ----- Finish -----
 	sg.Popup("Capture Task(s) Complete..")
-
+	return True
 
 
 def device_ip_list_file_exec(obj, i):

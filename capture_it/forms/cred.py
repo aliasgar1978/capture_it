@@ -38,7 +38,7 @@ def exec_cred_frame():
 
 		[sg.Text('Output Folder', font='Bold', text_color="black") ],
 		[sg.Text('select folder:', text_color="yellow"), 
-			sg.InputText('', key='op_folder'),  
+			sg.InputText('', key='cit_op_folder'),  
 			sg.FolderBrowse(),
 		],
 		under_line(80),
