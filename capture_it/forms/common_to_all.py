@@ -22,24 +22,12 @@ def cit_common_exec(obj, i):
 	forced_login = i['forced_login']
 	parsed_output = i['parsed_output']
 	visual_progress = i['visual_progress']
-	concurrent_connections = int(i['concurrent_connections']) if i['concurrent_connections'].isnumeric() else 100
+	max_connections = int(i['max_connections']) if i['max_connections'].isnumeric() else 100
 	common_log_file = i['common_log_file']
 	log_type = i['cred_log_type'] if i['cred_log_type'] else None
 	log_print = i['print']
 	append_to = f"{path}/{i['append_to']}"
 	fg = i['generate_facts']
-
-	# # # ---- PARA PRINT ----
-	# paras = (devices, auth, cmds, path, cumulative, forced_login, parsed_output, visual_progress, concurrent_connections, common_log_file,
-	# 	log_type, log_print, append_to, fg)
-	# for para in paras:
-	# 	print(para)
-	# print('path', path)
-	# print('common_log_file', common_log_file)
-	# print('log_type', log_type)
-	# print('log_print', log_print)
-	# print('append_to', append_to)
-	# return None
 
 	# # ---- START CAPTURE ----
 	c = capture(
@@ -53,7 +41,7 @@ def cit_common_exec(obj, i):
 	c.forced_login = forced_login
 	c.parsed_output = parsed_output
 	if visual_progress: c.visual_progress = visual_progress
-	if concurrent_connections: c.concurrent_connections = concurrent_connections
+	if max_connections: c.max_connections = max_connections
 	if log_type: c.log_type = log_type
 	if common_log_file and log_type=='common': c.common_log_file = common_log_file
 

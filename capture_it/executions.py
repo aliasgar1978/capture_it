@@ -34,10 +34,10 @@ class Execute_Common():
 		"""    		
 		self.add_auth_para(auth)
 		self.set_defaults()
-		self.verifications()
 		#
 
 	def __call__(self):
+		self.verifications()
 		self.start()
 		write_log(self.lg, self.log_type, self.common_log_file, self.path)
 
@@ -73,7 +73,7 @@ class Execute_Common():
 		self.CustomClass = None
 		self.fg = False
 		self.lg = Log()
-		self.concurrent_connections = 100
+		self.max_connections = 100
 
 	def verifications(self):
 		"""Verification/Validation of input values
@@ -86,84 +86,11 @@ class Execute_Common():
 		if self.log_type in ('common', 'both') and not self.common_log_file:
 			print( f"common_log_file is missing, debug log will not be generated" )
 			self.common_log_file = None
-		try:
-			self.max_connections = self.concurrent_connections
-		except:
-			msg_level, msg = 0, f"Invalid number of `concurrent_connections` defined {self.concurrent_connections}, default 100 taken."
-			visual_print(msg, msg_level, self.visual_progress)
+		if not isinstance(self.max_connections, int):
+			print(f"Invalid number of `max_connections` defined {self.max_connections}, default 100 taken.")
+			self.max_connections = 100
 
 
-	## getters/setters - Optional ##
-
-	@property
-	def cumulative(self):
-		return self._cumulative
-	@cumulative.setter
-	def cumulative(self, value):
-		self._cumulative = value
-
-	@property
-	def forced_login(self):
-		return self._forced_login
-	@forced_login.setter
-	def forced_login(self, value):
-		self._forced_login = value
-
-	@property
-	def parsed_output(self):
-		return self._parsed_output
-	@parsed_output.setter
-	def parsed_output(self, value):
-		self._parsed_output = value
-
-	@property
-	def visual_progress(self):
-		return self._visual_progress
-	@visual_progress.setter
-	def visual_progress(self, value):
-		self._visual_progress = value
-
-	@property
-	def log_type(self):
-		return self._log_type
-	@log_type.setter
-	def log_type(self, value):
-		self._log_type = value
-
-	@property
-	def common_log_file(self):
-		return self._common_log_file
-	@common_log_file.setter
-	def common_log_file(self, value):
-		self._common_log_file = value
-
-	@property
-	def CustomClass(self):
-		return self._CustomClass
-	@CustomClass.setter
-	def CustomClass(self, value):
-		self._CustomClass = value
-
-	@property
-	def fg(self):
-		return self._fg
-	@fg.setter
-	def fg(self, value):
-		self._fg = value
-
-	@property
-	def lg(self):
-		return self._lg
-	@lg.setter
-	def lg(self, value):
-		self._lg = value
-
-	@property
-	def concurrent_connections(self):
-		return self._concurrent_connections
-	@concurrent_connections.setter
-	def concurrent_connections(self, value):
-		self._concurrent_connections = value
 
 
 	## variable user inputs ##
@@ -290,7 +217,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 		visual_progress (int, optional): 0 will not show any progress, 10 will show all progress (default=3).
 		log_type (str): what type of log output requires. choices are = common, individual, both
 		common_log_file (str): output file name of a common log file
-		concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
+		max_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
 			default is 100.
 		CustomClass (class): Custom class definitition to execute additional custom commands
 
@@ -323,7 +250,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 
 		Args:
 			ip (str): ip address of a reachable device
-		"""    		
+		"""
 		# - capture instance -
 		ED = Execute_Device(ip, 
 			auth=self.auth, 
@@ -370,7 +297,7 @@ class Execute_By_Individual_Commands(Multi_Execution, Execute_Common):
 		visual_progress (int, optional): 0 will not show any progress, 10 will show all progress (default=3).
 		log_type (str): what type of log output requires. choices are = common, individual, both
 		common_log_file (str): output file name of a common log file
-		concurrent_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
+		max_connections (int, optional): 100: manipulate how many max number of concurrent connections to be establish.
 			default is 100.
 		CustomClass (class): Custom class definitition to execute additional custom commands
 
