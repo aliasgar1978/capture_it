@@ -15,7 +15,7 @@ docs_extras = [
 
 setuptools.setup(
     name="capture_it",
-    version="0.1.1",
+    version="0.1.2",
     author="ALIASGAR - ALI",
     author_email="aholo2000@gmail.com",
     description="Networking Device show output|Config capture and parsing utility",
