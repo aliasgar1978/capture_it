@@ -187,27 +187,58 @@ class Execute_Device():
 				msg_level, msg = 10, f"Connection established : {ip} == {c.hn}"
 				visual_print(msg, msg_level, self.visual_progress, self.logger_list)
 
-				cc = self.command_capture(c, self.cmds)
-				if not self.cumulative_filename: self.cumulative_filename = cc.cumulative_filename 
-				if self.parsed_output: 
-					self.xl_file = cc.write_facts()
+				cc = self.command_capture(c)
+				cc.grp_cmd_capture(self.cmds)
 
 				# -- custom commands -- only log entries, no parser
 				if self.CustomClass:
 					CC = self.CustomClass(self.path+"/"+c.hn+".log", self.dev.dtype)
-					self.command_capture(c, CC.cmds)
+					cc.grp_cmd_capture(CC.cmds)
+					self.add_cmds_to_self(CC.cmds)
 
 				# -- if facts generation - check mandary commands present, otherwise capture those --
 				if self.fg:
 					missed_cmds = self.check_facts_finder_requirements(c)
-					self.retry_missed_cmds(c, missed_cmds)
+					self.retry_missed_cmds(c, cc, missed_cmds)
+					self.add_cmds_to_self(missed_cmds)
+
+				# -- add command execution logs dataframe
+				cc.add_exec_logs()
+
+				# -- write facts to excel
+				if not self.cumulative_filename: self.cumulative_filename = cc.cumulative_filename 
+				if self.parsed_output: 
+					self.xl_file = cc.write_facts()
 
 				# -- add command execution logs
 				self.cmd_exec_logs = cc.cmd_exec_logs
 
+	def add_cmds_to_self(self, cmds):
+		"""add additional commands to cmds list
 
+		Args:
+			cmds (list): list of additinal or missed mandatory cmds to be captured 
+		"""		
+		if isinstance(self.cmds, list):
+			for cmd in cmds:
+				if cmd not in self.cmds:
+					self.cmds.append(cmd)
+		elif isinstance(self.cmds, set):
+			for cmd in cmds:
+				if cmd not in self.cmds:
+					self.cmds.add(cmd)
+		elif isinstance(self.cmds, tuple):
+			for cmd in cmds:
+				if cmd not in self.cmds:
+					self.cmds = list(self.cmds).append(cmd)
+		elif isinstance(self.cmds, dict):
+			for cmd in cmds:
+				if cmd not in self.cmds[self.dev.dtype]:
+					self.cmds[self.dev.dtype].append(cmd)
+		else:
+			print(f"Non standard command input {type(self.cmds)}\n{self.cmds}")
 
-	def command_capture(self, c, cmds):
+	def command_capture(self, c):
 		"""start command captures on connection object
 
 		Args:
@@ -218,7 +249,6 @@ class Execute_Device():
 
 		cc = Captures(dtype=self.dev.dtype, 
 			conn=c, 
-			cmds=cmds, 
 			path=self.path, 
 			visual_progress=self.visual_progress,
 			logger_list=self.logger_list,
@@ -229,17 +259,18 @@ class Execute_Device():
 
 
 
-	def missed_commands_capture(self, c, missed_cmds, x=""): 
+	def missed_commands_capture(self, c, cc, missed_cmds, x=""): 
 		"""recaptures missed commands
 
 		Args:
 			c (conn): connection object
+			cc(Captures): Capture / Command line processing object
 			missed_cmds (set): list/set of commands for which output to be recapture
 			x (int, optional): iteration value
 		"""		
 		msg_level, msg = 7, f"{c.hn} - Retrying missed_cmds({x+1}): {missed_cmds}"
 		visual_print(msg, msg_level, self.visual_progress, self.logger_list)
-		self.command_capture(c, missed_cmds)
+		cc.grp_cmd_capture(missed_cmds)
 
 	def is_any_ff_cmds_missed(self, c):
 		"""checks and returns missed mandatory capture commands
@@ -273,11 +304,12 @@ class Execute_Device():
 		"""		
 		return self.is_any_ff_cmds_missed(c)
 
-	def retry_missed_cmds(self,c, missed_cmds):
+	def retry_missed_cmds(self, c, cc, missed_cmds):
 		"""retry missed commands captures
 
 		Args:
 			c (conn): connection object instance
+			cc(Captures): Capture / Command line processing object
 			missed_cmds (set): missed commands
 
 		Returns:
@@ -285,7 +317,7 @@ class Execute_Device():
 		"""		
 		for x in range(3):   # 3-tries
 			if not missed_cmds: return None
-			self.missed_commands_capture(c, missed_cmds, x)
+			self.missed_commands_capture(c, cc, missed_cmds, x)
 			missed_cmds = self.is_any_ff_cmds_missed(c)
 		if missed_cmds:	
 			msg_level, msg = 3, f"{c.hn} - Error capture all mandatory commands, try do manually.."

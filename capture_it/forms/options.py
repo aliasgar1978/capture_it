@@ -25,7 +25,7 @@ def exec_options_frame():
 		[sg.Checkbox('Excel parsed file', key='parsed_output', default=True, text_color='yellow')],
 		[sg.Text('Max Concurrent Connections', text_color="yellow"), 
 		sg.InputText(100, key='max_connections', size=(5,1) ),
-		sg.Text('default:100', text_color="blue"), 
+		sg.Text('default:100 - Enter 1 for sequential process', text_color="white"), 
 		],
 		under_line(80),
 

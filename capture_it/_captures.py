@@ -32,13 +32,12 @@ class Captures(CLP):
 
 	"""    	
 
-	def __init__(self, dtype, conn, cmds, path, visual_progress, logger_list, cumulative=False, parsed_output=False):
+	def __init__(self, dtype, conn, path, visual_progress, logger_list, cumulative=False, parsed_output=False):
 		"""Initiate captures
 
 		Args:
 			dtype (str): device type
 			conn (conn): connection object
-			cmds (set, list, tuple): set of commands 
 			path (str): path to store the captured output
 			visual_progress (int): scale 0 to 10. 0 being no output, 10 all.
 			logger(list): device logging messages list
@@ -47,27 +46,28 @@ class Captures(CLP):
 		"""    		
 		self.logger_list = logger_list
 		super().__init__(dtype, conn, path, parsed_output, visual_progress, logger_list)
-		self.cmds = cmds
 		self.op = ''
 		self.visual_progress = visual_progress
 		self.cumulative = cumulative
 		self.cumulative_filename = None
-		self.grp_cmd_capture()
 
 
-	def grp_cmd_capture(self):
+	def grp_cmd_capture(self, cmds):
 		"""grep the command captures for each commands	
 		Unauthorized command will halt execution.
+
+		Args:
+			cmds (set, list, tuple): set of commands
 
 		Returns:
 			None: None
 		"""    		
 		banner = self.conn.banner
 		#
-		if isinstance(self.cmds, dict):
-			commands = self.cmds[self.dtype] 
-		if isinstance(self.cmds, (set, list, tuple)):
-			commands = self.cmds 
+		if isinstance(cmds, dict):
+			commands = cmds[self.dtype] 
+		if isinstance(cmds, (set, list, tuple)):
+			commands = cmds 
 		#
 		for cmd  in commands:
 			if not self.check_config_authorization(cmd): 
@@ -102,7 +102,6 @@ class Captures(CLP):
 		"""writes commands facts in to excel tab
 		"""
 		try:
-			self.add_exec_logs()
 			xl_file = self.path + "/" + self.conn.hn + ".xlsx"
 			msg_level, msg = 5, f"{self.hn} - writing facts to excel: {xl_file}"
 			visual_print(msg, msg_level, self.visual_progress, self.logger_list)
