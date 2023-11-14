@@ -8,7 +8,7 @@ from collections import OrderedDict
 # -----------------------------------------------------------------------------
 # STATIC VAR
 # -----------------------------------------------------------------------------
-BANNER = '! ~~~ RAW COMMANDS CAPTURE SUMMARY (aholo2000@gmail.com) ~~~ !'
+BANNER = '> ~~~ RAW COMMANDS CAPTURE SUMMARY (aholo2000@gmail.com) ~~~ <'
 
 # -----------------------------------------------------------------------------
 # LogSummary Class
@@ -33,7 +33,7 @@ class LogSummary():
 		"""		
 		self.s = ""
 		self.cmd_exec_logs_all = c.cmd_exec_logs_all
-		self.cmd_list_dict = c.cmds
+		self.set_cmd_listd_dict(c)
 		self.device_type_all = c.device_type_all
 		self.ips = c.ips
 		#
@@ -46,6 +46,18 @@ class LogSummary():
 		if print is True: self.print()
 		if write_to: self.write(write_to, wa='w')
 		if append_to: self.write(append_to, wa='a')
+
+	def set_cmd_listd_dict(self, c):
+		"""set command list dictionary for all commands executed for a given connection
+
+		Args:
+			c (conn): connection object
+		"""		
+		self.cmd_list_dict = c.all_cmds
+		try:
+			self.cmd_list_dict = { dt: sorted(list(set(cmds))) for dt, cmds in c.all_cmds.items() }
+		except:
+			pass
 
 	@property
 	def summary(self):

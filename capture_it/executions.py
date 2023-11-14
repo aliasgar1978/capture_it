@@ -1,5 +1,6 @@
 # -----------------------------------------------------------------------------
 import os
+from copy import deepcopy
 try:
 	from nettoolkit_common import *
 	from nettoolkit.addressing import *
@@ -233,6 +234,7 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 		Execute_Common.__init__(self, auth)
 		self.devices = STR.to_set(ip_list) if isinstance(ip_list, str) else set(ip_list)
 		self.cmds = cmds
+		self.all_cmds = deepcopy(self.cmds)
 		self.path = path
 		#
 		self.ips = []
@@ -264,14 +266,29 @@ class Execute_By_Login(Multi_Execution, Execute_Common):
 			CustomClass=self.CustomClass,
 			fg=self.fg,
 			)
+
 		# - capture logs -
 		if self.log_type and self.log_type.lower() in ('individual', 'both'):
 			self.lg.write_individuals(self.path)
 		self.cmd_exec_logs_all[ED.hostname] = ED.cmd_exec_logs
 		self.device_type_all[ED.hostname] =  ED.dev.dtype
 		self.ips.append(ip)
+
+		# - update all cmds
+		self.update_all_cmds(ED)
+
 		# - facts generations -
 		if self.fg: self.ff_sequence(ED, self.CustomDeviceFactsClass, self.foreign_keys)
+
+
+	def update_all_cmds(self, ED):
+		"""update executed commands for all commands dictionary 
+
+		Args:
+			ED (Execute_Device): Device Execution object instance
+		"""		
+		dt = ED.dev.dtype
+		self.all_cmds[dt].extend(ED.all_cmds[dt])
 
 
 

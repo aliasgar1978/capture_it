@@ -8,6 +8,7 @@ except:
 	# backword compatible
 	from nettoolkit import STR, IP
 
+from copy import deepcopy
 import facts_finder as ff
 from .common import visual_print
 from ._detection import DeviceType
@@ -52,7 +53,8 @@ class Execute_Device():
 		"""    		
 		self.log_key = ip
 		self.auth = auth
-		self.cmds = cmds
+		self.cmds = deepcopy(cmds)
+		self.all_cmds = deepcopy(cmds)
 		self.path = path
 		self.cumulative = cumulative
 		self.cumulative_filename = None
@@ -190,17 +192,19 @@ class Execute_Device():
 				cc = self.command_capture(c)
 				cc.grp_cmd_capture(self.cmds)
 
-				# -- custom commands -- only log entries, no parser
-				if self.CustomClass:
-					CC = self.CustomClass(self.path+"/"+c.hn+".log", self.dev.dtype)
-					cc.grp_cmd_capture(CC.cmds)
-					self.add_cmds_to_self(CC.cmds)
-
 				# -- if facts generation - check mandary commands present, otherwise capture those --
 				if self.fg:
 					missed_cmds = self.check_facts_finder_requirements(c)
 					self.retry_missed_cmds(c, cc, missed_cmds)
 					self.add_cmds_to_self(missed_cmds)
+					self.all_cmds[self.dev.dtype].extend(missed_cmds)
+
+				# -- custom commands -- only log entries, no parser
+				if self.CustomClass:
+					CC = self.CustomClass(self.path+"/"+c.hn+".log", self.dev.dtype)
+					cc.grp_cmd_capture(CC.cmds)
+					self.add_cmds_to_self(CC.cmds)
+					self.all_cmds[self.dev.dtype].extend(CC.cmds)
 
 				# -- add command execution logs dataframe
 				cc.add_exec_logs()
