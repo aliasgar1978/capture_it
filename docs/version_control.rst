@@ -32,11 +32,23 @@ Version Control
    * - 0.0.20
      - Sep 18, 2023
      - added ``CustomClass`` argument feature, to capture additional **custom commands**.
+   * - 0.1.3
+     - Nov 1, 2023
+     - * added methods to identify and retry missed commands.
+       * added methods to add missed commands and custom commands results in log summary output.
+       * a few bug fixes.
 
 
+.. warning::
 
+  * Updation of this package individually is stopped.
+  * Package is incorporated in ``nettoolkit`` package as a sub-package.
+  * Use nettoolkit for the future updates.
+
+-----
 
 .. note::
 
-   Updates prior 0.0.15 were untracked.
+   * Updates prior 0.0.15 were untracked.
+   * Some of the minor version changes untracked and not published.
 
